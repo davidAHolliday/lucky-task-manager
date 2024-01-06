@@ -266,12 +266,14 @@ const handleNewNoteInputChange = (event) => {
   </div>
             <Box display="flex" flexDirection={"column"} justifyContent="center" alignItems="center" p={5}>
                 {data.map(task => (
-                    <Card onClick={()=>{
-                        setDisplayModal({taskInfo:true})
-                        setSelectedTask(task)
-                    }}
+                    <Card
                     key={task.taskId} sx={{ display: "flex", width: "100%", margin: 1 }}>
-                        <CardContent><div style={{display:"flex", flexDirection:"column"}}>
+                        <CardContent><div 
+                         onClick={()=>{
+                            setDisplayModal({taskInfo:true})
+                            setSelectedTask(task)
+                        }}
+                        style={{display:"flex", flexDirection:"column"}}>
                             <div>
                             {formatDate(task.timeCreated)} 
                             </div >
@@ -291,7 +293,10 @@ const handleNewNoteInputChange = (event) => {
                             </Typography>
                             
                             </div>  </CardContent>
-                        <CardContent>
+                        <CardContent  onClick={()=>{
+                        setDisplayModal({taskInfo:true})
+                        setSelectedTask(task)
+                    }}>
                             <Typography variant="h5" component="div">
                                 {task.taskName}
                             </Typography>
