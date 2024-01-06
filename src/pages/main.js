@@ -266,9 +266,9 @@ const handleNewNoteInputChange = (event) => {
   </div>
             <Box display="flex" flexDirection={"column"} justifyContent="center" alignItems="center" p={5}>
                 {data.map(task => (
-                    <Card
+                    <Card style={{textDecoration: task.status === "close"?"line-through":""}}
                     key={task.taskId} sx={{ display: "flex", width: "100%", margin: 1 }}>
-                        <CardContent><div 
+                        <CardContent ><div 
                          onClick={()=>{
                             setDisplayModal({taskInfo:true})
                             setSelectedTask(task)
