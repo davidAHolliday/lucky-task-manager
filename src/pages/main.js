@@ -336,8 +336,9 @@ const handleNewNoteInputChange = (event) => {
                     </Card>
                 ))}
                 <Snackbar
+                style={{padding:"80px"}}
                     open={openToast}
-                    autoHideDuration={6000}
+                    autoHideDuration={1000}
                     onClose={handleCloseToast}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                 >
