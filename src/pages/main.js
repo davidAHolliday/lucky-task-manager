@@ -161,6 +161,17 @@ const handleNewTask = () =>{
             handleToast('Failed to update task status', 'error');
         });
 
+        //Reset Data
+    setNewTaskData({
+        taskName: '',
+        taskDescription: '',
+        tags: [],
+        notes: [],
+        status: 'open',
+        dueDate: '',
+        assignedTo:"",
+    })
+
    }
 
 const handleNewNoteInputChange = (event) => {
