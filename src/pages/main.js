@@ -415,19 +415,19 @@ const handleNewNoteInputChange = (event) => {
 
 
 </div>
-            <Box display="flex" flexDirection={"column"} justifyContent="center" alignItems="center" p={5}>
+            <Box  display="flex" flexDirection={"column"} justifyContent="center" alignItems="center" p={5}>
                 {filteredTasks.map(task => (
                     <Card style={{textDecoration: task.status === "close"?"line-through":""}}
-                    key={task.taskId} sx={{ display: "flex", width: "100%", margin: 1 }}>
+                    key={task.taskId} sx={{ display: "flex", minWidth: "100%", margin: 1 }}>
                         <CardContent style={{width:"20%"}}>
                             <div  
                                 onClick={()=>{
                                 handleShowDetails(task)}}
 
                         style={{display:"flex", flexDirection:"column"}}>
-                            <div>
-                            {formatDate(task.dueDate)} 
-                            </div >
+                            <div style={{marginBottom:"5px"}}>
+                            Due {formatDate(task.dueDate)} 
+                            </div  >
                             <Typography 
                              style={{
                                 display: 'inline-block',
