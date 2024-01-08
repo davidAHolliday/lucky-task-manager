@@ -459,6 +459,7 @@ const handleNewNoteInputChange = (event) => {
         const color = colors[index % colors.length];
         
         const tagStyle = {
+            opacity:tag==tagValue ?"100%":"60%",
             backgroundColor: color,
             padding: "5px 10px",
             margin: "5px",
