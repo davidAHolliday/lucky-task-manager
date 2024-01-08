@@ -158,7 +158,8 @@ body {
 @media only screen and (max-width: 480px) {
   .App {
     width: 100%; /* Adjust to full width for better mobile view */
-    padding: 0 10px; /* Add horizontal padding for better spacing */
+    padding: 10px 10px; /* Add horizontal padding for better spacing */
+    margin-left: 30px;
   }
 
   .App-header {

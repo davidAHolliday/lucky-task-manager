@@ -634,7 +634,7 @@ const handleNewNoteInputChange = (event) => {
                                     <CheckBoxIcon />
                                 </div>
                             )}
-                           <Delete onClick={()=>handleTaskDelete(task.taskId)}/>
+                           <Delete style={{marginTop:"20px"}} onClick={()=>handleTaskDelete(task.taskId)}/>
                         </CardContent>
                     </Card>
                 ))}
