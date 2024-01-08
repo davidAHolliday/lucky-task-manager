@@ -17,20 +17,10 @@ import { baseUrl } from "../utils/helperFunctions";
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Switch from '@mui/material/Switch';
-import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import FormHelperText from '@mui/material/FormHelperText';
-import { makeStyles } from '@material-ui/core/styles';
 
-const useStyles = makeStyles({
-    customBox: {
-      /* Your custom styles here */
-      padding: 0,
-      /* ... other styles ... */
-    },
-  });
 
 
 
@@ -45,12 +35,13 @@ function Dashboard() {
     const [taskProfile, setTaskProfile] = useState(); 
     const [displayDetails, setDisplayDetails] = useState(false)
     const [filterValue, setFilterValue] = useState("All"); // The selected user or tag to filter by
+    const [tagValue, setTagValue] = useState("All"); // The selected user or tag to filter by
+
     const [filteredTasks, setFilteredTasks] = useState(data); // Initially set to all tasks
     const [switchState, setSwitchState] = useState(true)
 
 
 
-    const classes = useStyles();
 
     // const [displayNewTaskModal,setDisplayNewTaskModal] = useState(false)
     const [newTaskData, setNewTaskData] = useState({
@@ -69,6 +60,10 @@ const users = [...new Set(data.map(task => task.assignedTo))]; // Unique assigne
 
 
 
+
+const handleTagClick = (tag) => {
+    setTagValue(tag);
+};
 
 const handleShowDetails = (task) =>{
     setDisplayDetails(true)
@@ -94,7 +89,7 @@ const handleAddNotes = () =>{
                 setUpdateMessage(`Note has been added`);
                 handleToast(`Note has been added`, 'success');
         //Now lets reset the input field
-        setNoteData("")
+        setNoteData({noteText:""})
     
         
 })}
@@ -222,37 +217,44 @@ const handleNewNoteInputChange = (event) => {
     }, [updateMessage,noteData]);
 
 
-    useEffect(() => {
+
+      const tags = [...new Set(data.flatMap(task => task.tags))]; // Unique tags across all tasks
+    
+      useEffect(() => {
         if (data.length > 0) {
-          let filtered = []; // Declare the filtered array outside of conditional blocks
-      
-          if (filterValue === "All") {
-            if (switchState) {
-              filtered = data.filter(task => task.status === "open");
+            let filtered = []; // Declare the filtered array outside of conditional blocks
+    
+            // Filter tasks based on the selected user (filterValue) and status
+            if (filterValue === "All") {
+                if (switchState) {
+                    filtered = data.filter(task => task.status === "open");
+                } else {
+                    filtered = [...data]; // Copy all tasks if switchState is false
+                }
             } else {
-              filtered = [...data]; // Copy all tasks if switchState is false
+                if (switchState) {
+                    filtered = data.filter(task => task.assignedTo === filterValue && task.status === "open");
+                } else {
+                    filtered = data.filter(task => task.assignedTo === filterValue);
+                }
             }
-          } else {
-            if (switchState) {
-              filtered = data.filter(task => task.assignedTo === filterValue && task.status === "open");
-            } else {
-              filtered = data.filter(task => task.assignedTo === filterValue);
+    
+            // If a tagValue is selected, further filter the tasks by the selected tag
+            if (tagValue !== "All") {
+                filtered = filtered.filter(task => task.tags.includes(tagValue));
             }
-          }
-      
-          // Sort the tasks by due date
-          const sortedTasks = filtered.sort((a, b) => {
-            const dateComparison = new Date(a.dueDate) - new Date(b.dueDate);
-            return dateComparison;
-          });
-      
-          // Update the filtered tasks state
-          setFilteredTasks([...sortedTasks]);
+    
+            // Sort the tasks by due date
+            const sortedTasks = filtered.sort((a, b) => {
+                const dateComparison = new Date(a.dueDate) - new Date(b.dueDate);
+                return dateComparison;
+            });
+    
+            // Update the filtered tasks state
+            setFilteredTasks([...sortedTasks]);
         }
-      }, [filterValue, data, switchState]); // Include switchState in the dependency array
-            
-
-
+    }, [filterValue, tagValue, data, switchState]); // Include tagValue in the dependency array
+    
     
 
 
@@ -269,6 +271,9 @@ const handleNewNoteInputChange = (event) => {
         />
       </FormGroup>
     </FormControl>
+
+
+
 
               {/*  Info Modal */}
               { taskProfile  && <>
@@ -307,16 +312,14 @@ const handleNewNoteInputChange = (event) => {
     name="notes"
     label="Notes"
     type="text"
-    style={{ width: '20px' }}  // <-- Set the width using inline styles
+    style={{ width: '100%' }}  // <-- Set the width using inline styles
     value={noteData.noteText}
     onChange={handleNewNoteInputChange}  // Ensure this is correctly set
 />
 
             </div>
             
-          
-
-      
+        
         
         </DialogContent>
         <DialogActions>
@@ -436,12 +439,48 @@ const handleNewNoteInputChange = (event) => {
         </MenuItem>
     ))}
 </Select>
-  
+
 
 
 </div>
-            <Box   
-             classes={{ root: classes.customBox }} 
+
+<div style={{ 
+    height: "auto",
+    backgroundColor: "blue", 
+    display: "flex", 
+    flexWrap: "wrap",
+    justifyContent: "center", 
+    alignItems: "center",
+    width: "100%",
+    overflowX: "auto"
+}}>
+    {tags.map((tag, index) => {
+        const colors = ["#FFCCCC", "#CCFFCC", "#CCCCFF", "#FFCCFF", "#FFFFCC", "#CCFFFF"];
+        const color = colors[index % colors.length];
+        
+        const tagStyle = {
+            backgroundColor: color,
+            padding: "5px 10px",
+            margin: "5px",
+            borderRadius: "5px",
+            color: "black",
+            fontWeight: "bold",
+            cursor: "pointer"  // Add cursor pointer to indicate clickable
+        };
+
+        return (
+            <div 
+                key={index} 
+                style={tagStyle}
+                onClick={() => handleTagClick(tag)} // Handle tag click
+            >
+                {tag}
+            </div>
+        );
+    })}
+</div>
+  
+            <Box style={{ padding: 0}}    width={"100%"} paddin
              display="flex" flexDirection={"column"} justifyContent="center" alignItems="center" p={5}>
                 {filteredTasks.map(task => (
                     <Card style={{textDecoration: task.status === "close"?"line-through":""}}
