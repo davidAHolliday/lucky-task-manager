@@ -1,69 +1,79 @@
+/* General styles */
 .App {
-  text-align: center;
-  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+.App-header{
+  width: 720px;
+}
+
+@media only screen and (min-width: 390px)
+{
+  .App-header {
+    width: 320px;
+  }
+
+
+
+  .dialog-content {
+    width: 90%;
+    max-width: 90%;
+  }
+
+  .css-1bp1ao6{
+    width: 44%;
+  }
+
+}
+
+
+/* Adjustments for mobile screens */
+@media only screen and (max-width: 768px) {
+  .App {
+    padding: 10px; /* Add some padding for spacing */
+  }
   
-}
-
-
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+  /* Adjust the modal width for mobile */
+  .dialog-content {
+    width: 100%;
+    max-width: 100%;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 1vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f4f4f4;
-}
-
+/* Flexbox styles */
+.filter-container,
 .add-button {
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 20px;
-  background-color: #007bff;
-  color: #ffffff;
-  font-size: 48px; /* Adjust font size as needed */
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  align-items: center;
 }
 
-.add-button:hover {
-  transform: scale(.9); /* Add hover effect */
+/* Adjustments for Task Cards */
+.Card {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%; /* Ensure it takes full width */
+  margin-bottom: 10px; /* Add spacing between cards */
 }
 
-.plus-sign {
-  margin-right: 10px; /* Add space between the plus sign and text */
+/* Adjust the card content for mobile */
+.CardContent {
+  flex: 1; /* Allow content to grow */
+  padding: 10px; /* Add some padding */
 }
 
-.button-text {
-  font-size: 24px; /* Adjust font size as needed */
+/* Adjustments for typography and other elements */
+.App-header,
+h2,
+h4,
+p,
+span {
+  max-width: 100%; /* Ensure text doesn't overflow on mobile */
+}
+
+/* Adjustments for TextField */
+.TextField {
+  width: 100%; /* Ensure the TextField takes full width on mobile */
 }

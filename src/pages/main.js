@@ -22,6 +22,16 @@ import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles({
+    customBox: {
+      /* Your custom styles here */
+      padding: 0,
+      /* ... other styles ... */
+    },
+  });
+
 
 
 function Dashboard() {
@@ -38,6 +48,9 @@ function Dashboard() {
     const [filteredTasks, setFilteredTasks] = useState(data); // Initially set to all tasks
     const [switchState, setSwitchState] = useState(true)
 
+
+
+    const classes = useStyles();
 
     // const [displayNewTaskModal,setDisplayNewTaskModal] = useState(false)
     const [newTaskData, setNewTaskData] = useState({
@@ -245,6 +258,7 @@ const handleNewNoteInputChange = (event) => {
 
     return (
         <div className="App">
+       
                 <FormControl component="fieldset" variant="standard">
       <FormGroup>
         <FormControlLabel
@@ -261,7 +275,7 @@ const handleNewNoteInputChange = (event) => {
         <Dialog open={displayDetails} onClose={() => setDisplayDetails(false)}>
         <DialogTitle style={{backgroundColor:"lightblue"}}>Task Details</DialogTitle>
         <DialogContent>
-            <div style ={{height:"500px", width:"700px"}}>
+            <div style ={{height:"500px", width:"300px"}}>
                 <h2>{taskProfile.taskName}</h2>
                 <p><span style={{fontWeight:500, marginRight:"5px"}}>Description:</span>{taskProfile.taskDescription}</p>
                 <p> <span style={{fontWeight:500, marginRight:"5px"}}>Assigned To:</span> {taskProfile.assignedTo || "unknown"} on {formatDate(taskProfile.timeCreated)}</p>
@@ -293,7 +307,7 @@ const handleNewNoteInputChange = (event) => {
     name="notes"
     label="Notes"
     type="text"
-    fullWidth
+    style={{ width: '20px' }}  // <-- Set the width using inline styles
     value={noteData.noteText}
     onChange={handleNewNoteInputChange}  // Ensure this is correctly set
 />
@@ -426,7 +440,9 @@ const handleNewNoteInputChange = (event) => {
 
 
 </div>
-            <Box  display="flex" flexDirection={"column"} justifyContent="center" alignItems="center" p={5}>
+            <Box   
+             classes={{ root: classes.customBox }} 
+             display="flex" flexDirection={"column"} justifyContent="center" alignItems="center" p={5}>
                 {filteredTasks.map(task => (
                     <Card style={{textDecoration: task.status === "close"?"line-through":""}}
                     key={task.taskId} sx={{ display: "flex", minWidth: "100%", margin: 1 }}>
