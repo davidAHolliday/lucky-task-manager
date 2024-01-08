@@ -14,6 +14,15 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import { baseUrl } from "../utils/helperFunctions";
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import Switch from '@mui/material/Switch';
+import FormLabel from '@mui/material/FormLabel';
+import FormControl from '@mui/material/FormControl';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormHelperText from '@mui/material/FormHelperText';
+
 
 function Dashboard() {
     const [data, setData] = useState([]);
@@ -27,6 +36,7 @@ function Dashboard() {
     const [displayDetails, setDisplayDetails] = useState(false)
     const [filterValue, setFilterValue] = useState("All"); // The selected user or tag to filter by
     const [filteredTasks, setFilteredTasks] = useState(data); // Initially set to all tasks
+    const [switchState, setSwitchState] = useState(true)
 
 
     // const [displayNewTaskModal,setDisplayNewTaskModal] = useState(false)
@@ -78,6 +88,12 @@ const handleAddNotes = () =>{
 
 //update notes on use effect
 
+
+    const handleToggle = (event) => {
+        setSwitchState(event.target.checked);
+      };
+      
+  
 
 
 
@@ -182,17 +198,35 @@ const handleNewNoteInputChange = (event) => {
     }, [updateMessage,noteData]);
 
 
-    useEffect(()=>{
+    useEffect(() => {
         if (data.length > 0) {
-            if (filterValue === "All") {
-                setFilteredTasks(data); // Set all tasks when "All" is selected
+          let filtered = []; // Declare the filtered array outside of conditional blocks
+      
+          if (filterValue === "All") {
+            if (switchState) {
+              filtered = data.filter(task => task.status === "open");
             } else {
-                const filtered = data.filter(task => task.assignedTo === filterValue);
-                setFilteredTasks(filtered);
+              filtered = [...data]; // Copy all tasks if switchState is false
             }
+          } else {
+            if (switchState) {
+              filtered = data.filter(task => task.assignedTo === filterValue && task.status === "open");
+            } else {
+              filtered = data.filter(task => task.assignedTo === filterValue);
+            }
+          }
+      
+          // Sort the tasks by due date
+          const sortedTasks = filtered.sort((a, b) => {
+            const dateComparison = new Date(a.dueDate) - new Date(b.dueDate);
+            return dateComparison;
+          });
+      
+          // Update the filtered tasks state
+          setFilteredTasks([...sortedTasks]);
         }
-    
-    },[filterValue,data])
+      }, [filterValue, data, switchState]); // Include switchState in the dependency array
+            
 
 
     
@@ -200,6 +234,17 @@ const handleNewNoteInputChange = (event) => {
 
     return (
         <div className="App">
+                <FormControl component="fieldset" variant="standard">
+      <FormGroup>
+        <FormControlLabel
+          control={
+            <Switch checked={switchState} onChange={handleToggle} name="Open" />
+          }
+          label="Show Open Only"
+        />
+      </FormGroup>
+    </FormControl>
+
               {/*  Info Modal */}
               { taskProfile  && <>
         <Dialog open={displayDetails} onClose={() => setDisplayDetails(false)}>
@@ -353,14 +398,19 @@ const handleNewNoteInputChange = (event) => {
   </div>
 
   <div className="filter-container">
-    <select onChange={(e) => setFilterValue(e.target.value)}>
-    <option  value={"All"}> All</option>
-      {users.map((user, index) => (
-        <option key={index} value={user}>
-          {user}
-        </option>
-      ))}
-    </select>
+  <Select
+    value={filterValue}
+    onChange={(e) => setFilterValue(e.target.value)}
+    variant="outlined" // optional, gives an outlined appearance
+    style={{ width: '100%' }} // optional, adjust as per your design needs
+>
+    <MenuItem value={"All"}>All</MenuItem>
+    {users.map((user, index) => (
+        <MenuItem key={index} value={user}>
+            {user}
+        </MenuItem>
+    ))}
+</Select>
   
 
 
@@ -376,7 +426,7 @@ const handleNewNoteInputChange = (event) => {
 
                         style={{display:"flex", flexDirection:"column"}}>
                             <div>
-                            {formatDate(task.timeCreated)} 
+                            {formatDate(task.dueDate)} 
                             </div >
                             <Typography 
                              style={{
