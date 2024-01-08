@@ -25,6 +25,9 @@ function Dashboard() {
     const [displayModal, setDisplayModal] = useState({newTask:false})
     const [taskProfile, setTaskProfile] = useState(); 
     const [displayDetails, setDisplayDetails] = useState(false)
+    const [filterValue, setFilterValue] = useState("All"); // The selected user or tag to filter by
+    const [filteredTasks, setFilteredTasks] = useState(data); // Initially set to all tasks
+
 
     // const [displayNewTaskModal,setDisplayNewTaskModal] = useState(false)
     const [newTaskData, setNewTaskData] = useState({
@@ -39,10 +42,12 @@ function Dashboard() {
 const [noteData,setNoteData] = useState({noteText:"",createdBy:""});
 
 
+const users = [...new Set(data.map(task => task.assignedTo))]; // Unique assigned users
+
+
 
 
 const handleShowDetails = (task) =>{
-    console.log("click")
     setDisplayDetails(true)
 
         axios.get(`${baseUrl}/task/v1/task/${task.taskId}`)
@@ -142,33 +147,6 @@ const handleNewTask = () =>{
 
    }
 
-
-//    const handleAddNotes = () => {
-//     const payload = noteData;
-
-//     const url = `${baseUrl}/task/v1/notes/${selectedTask.taskId}/`;
-//     axios.put(url, payload)
-//         .then(response => {
-//             setUpdateMessage(`Note has been added`);
-//             handleToast(`Note has been added`, 'success');
-
-//             // Assuming you can fetch the updated task details directly after adding a note
-//             axios.get(`${baseUrl}/task/v1/task/${selectedTask.taskId}`)
-//                 .then(response => {
-//                     setTaskProfile(response.data); // Update taskProfile with the updated data
-//                 })
-//                 .catch(error => {
-//                     console.error("Error Fetching Updated Task Data:", error);
-//                 });
-//         })
-//         .catch(error => {
-//             console.error("Error Adding Note:", error);
-//             handleToast('Failed to add note', 'error');
-//         });
-// };
-
-
-
 const handleNewNoteInputChange = (event) => {
     const { value } = event.target;
     setNoteData((prev)=>({...prev,noteText:value,createdBy:"M. Perez"}));
@@ -204,6 +182,20 @@ const handleNewNoteInputChange = (event) => {
     }, [updateMessage,noteData]);
 
 
+    useEffect(()=>{
+        if (data.length > 0) {
+            if (filterValue === "All") {
+                setFilteredTasks(data); // Set all tasks when "All" is selected
+            } else {
+                const filtered = data.filter(task => task.assignedTo === filterValue);
+                setFilteredTasks(filtered);
+            }
+        }
+    
+    },[filterValue,data])
+
+
+    
 
 
     return (
@@ -258,7 +250,7 @@ const handleNewNoteInputChange = (event) => {
         
         </DialogContent>
         <DialogActions>
-                    <Button onClick={() => setDisplayModal({taskInfo:false})} color="primary">
+                    <Button onClick={() => setDisplayDetails(false)} color="primary">
                         Cancel
                     </Button>
                     <Button onClick={()=>handleAddNotes()} color="primary">
@@ -359,15 +351,29 @@ const handleNewNoteInputChange = (event) => {
     <span class="plus-sign">+</span>
     <span class="button-text">Add</span>
   </div>
+
+  <div className="filter-container">
+    <select onChange={(e) => setFilterValue(e.target.value)}>
+    <option  value={"All"}> All</option>
+      {users.map((user, index) => (
+        <option key={index} value={user}>
+          {user}
+        </option>
+      ))}
+    </select>
+  
+
+
+</div>
             <Box display="flex" flexDirection={"column"} justifyContent="center" alignItems="center" p={5}>
-                {data.map(task => (
+                {filteredTasks.map(task => (
                     <Card style={{textDecoration: task.status === "close"?"line-through":""}}
                     key={task.taskId} sx={{ display: "flex", width: "100%", margin: 1 }}>
-                        <CardContent ><div 
-                         onClick={()=>{
-                            handleShowDetails(task)
-            
-                        }}
+                        <CardContent style={{width:"20%"}}>
+                            <div  
+                                onClick={()=>{
+                                handleShowDetails(task)}}
+
                         style={{display:"flex", flexDirection:"column"}}>
                             <div>
                             {formatDate(task.timeCreated)} 
@@ -387,14 +393,16 @@ const handleNewNoteInputChange = (event) => {
                             {task.assignedTo}
                             </Typography>
                             
-                            </div>  </CardContent>
-                        <CardContent  onClick={()=>{
+                            </div>  
+                            </CardContent>
+                        <CardContent  style={{width:"30%"}}
+                        onClick={()=>{
                                     handleShowDetails(task)                    }}>
                             <Typography variant="h5" component="div">
                                 {task.taskName}
                             </Typography>
                         </CardContent>
-                        <CardContent>
+                        <CardContent style={{width:"30%"}}>
                             {task.tags.map((tag, index) => (
                                 <div
                                     key={index}
@@ -413,10 +421,11 @@ const handleNewNoteInputChange = (event) => {
                                 </div>
                             ))}
                         </CardContent>
-                        <CardContent>
+                        <CardContent style={{width:"20%"}}>
                             {task.status === "open" && (
-                                <div onClick={() => {
-                                    handleShowDetails(task)                              
+                                  <div onClick={() => {
+                                    setSelectedTask({ taskId: task.taskId, value: "" });
+                                    changeStatus("close",task.taskId);
                                 }}>
                                     <CheckBoxOutlineBlankIcon />
                                 </div>
