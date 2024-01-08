@@ -115,7 +115,7 @@ const handleAddNotes = () =>{
         const year = date.getFullYear();
     
         // Format the components into dd/mm/yyyy format
-        const formattedDate = `${day}/${month}/${year}`;
+        const formattedDate = `${month}/${day}/${year}`;
     
         return formattedDate;
     }
