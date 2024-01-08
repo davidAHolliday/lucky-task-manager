@@ -20,6 +20,8 @@ import Switch from '@mui/material/Switch';
 import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Delete, DeleteForever } from "@mui/icons-material";
 
 
 
@@ -28,6 +30,7 @@ function Dashboard() {
     const [data, setData] = useState([]);
     const [updateMessage, setUpdateMessage] = useState('');
     const [selectedTask, setSelectedTask] = useState();
+    const [selectedForDelete,setSelectedForDelete] = useState()
     const [openToast, setOpenToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastSeverity, setToastSeverity] = useState('success');
@@ -36,9 +39,10 @@ function Dashboard() {
     const [displayDetails, setDisplayDetails] = useState(false)
     const [filterValue, setFilterValue] = useState("All"); // The selected user or tag to filter by
     const [tagValue, setTagValue] = useState("All"); // The selected user or tag to filter by
-
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [filteredTasks, setFilteredTasks] = useState(data); // Initially set to all tasks
     const [switchState, setSwitchState] = useState(true)
+    const [deletedItemResponse, setDeletedItemResponse] = useState();
 
 
 
@@ -203,7 +207,7 @@ const handleNewNoteInputChange = (event) => {
     };
 
 
-
+//Fetches Data
     const url = `${baseUrl}/task/v1/`;
     useEffect(() => {
         axios.get(url)
@@ -214,8 +218,7 @@ const handleNewNoteInputChange = (event) => {
             .catch(error => {
                 console.error("Error Fetching Data:", error);
             });
-    }, [updateMessage,noteData]);
-
+    }, [updateMessage,noteData,deletedItemResponse]);
 
 
       const tags = ["All",...new Set(data.flatMap(task => task.tags))]; // Unique tags across all tasks
@@ -255,6 +258,51 @@ const handleNewNoteInputChange = (event) => {
         }
     }, [filterValue, tagValue, data, switchState]); // Include tagValue in the dependency array
     
+    const handleTaskDelete = (id) => {
+        setSelectedForDelete(id);
+        // Display the delete confirmation modal
+        setShowDeleteConfirmation(true);
+    };
+
+
+    const deleteNote = (noteId) => {
+        // Perform the delete action here
+        // You can call your delete API endpoint or any logic needed
+        const url = `${baseUrl}/task/v1/note/${taskProfile.taskId}/${noteId}`;
+        axios.delete(url)
+            .then(response => {
+                // setDeletedItemResponse(response.data)
+                setTaskProfile(response.data)
+                console.log(response.data);
+            })
+            .catch(error => {
+                console.error("Error Fetching Data:", error);
+            });
+    };
+
+
+
+    const confirmDelete = () => {
+        // Perform the delete action here
+        // You can call your delete API endpoint or any logic needed
+        const url = `${baseUrl}/task/v1/task/${selectedForDelete}`;
+        axios.delete(url)
+            .then(response => {
+                setDeletedItemResponse(response.data)
+                console.log(response.data);
+                handleCloseDeleteConfirmation(); // Close the confirmation modal after successful delete
+            })
+            .catch(error => {
+                console.error("Error Fetching Data:", error);
+            });
+    };
+
+    
+    const handleCloseDeleteConfirmation = () => {
+        // Close the delete confirmation modal
+        setShowDeleteConfirmation(false);
+    };
+
     
 
 
@@ -272,6 +320,21 @@ const handleNewNoteInputChange = (event) => {
       </FormGroup>
     </FormControl>
 
+ {/* Delete Confirmation Modal */}
+ <Dialog open={showDeleteConfirmation} onClose={handleCloseDeleteConfirmation}>
+                    <DialogTitle>Confirmation</DialogTitle>
+                    <DialogContent>
+                        <Typography>Are you sure you want to delete this task?</Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDeleteConfirmation} color="primary">
+                            Cancel
+                        </Button>
+                        <Button onClick={confirmDelete} color="primary">
+                            Delete
+                        </Button>
+                    </DialogActions>
+                </Dialog>
 
 
 
@@ -290,15 +353,31 @@ const handleNewNoteInputChange = (event) => {
     <div style={{ marginTop: '20px', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
         <h4 style={{ marginBottom: '10px' }}>Notes:</h4>
         {taskProfile.notes.map((note, index) => (
-            <div key={index} style={{ marginBottom: '15px', padding: '10px', borderRadius: '5px', boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.1)', backgroundColor: '#f9f9f9' }}>
-                <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#333' }}>
-                    {formatDate(note.timeCreated)}
-                </p>
-                <p style={{ fontSize: '14px', color: '#555' }}>
-                    {note.noteText}
-                </p>
-            </div>
-        ))}
+    <div 
+        key={index} 
+        style={{ 
+            display: 'flex',  // Make it a flex container
+            justifyContent: 'space-between',  // Align items to the far ends
+            marginBottom: '15px', 
+            padding: '10px', 
+            borderRadius: '5px', 
+            boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.1)', 
+            backgroundColor: '#f9f9f9' 
+        }}
+    >
+        <div>
+            <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#333' }}>
+                {formatDate(note.timeCreated)}
+            </p>
+            <p style={{ fontSize: '14px', color: '#555' }}>
+                {note.noteText}
+            </p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+            <DeleteForever onClick={()=>{deleteNote(note.noteId)}}/>  {/* This will be positioned at the far right */}
+        </div>
+    </div>
+))}
     </div>
 ) : (
     <p>No notes available.</p>
@@ -555,6 +634,7 @@ const handleNewNoteInputChange = (event) => {
                                     <CheckBoxIcon />
                                 </div>
                             )}
+                           <Delete onClick={()=>handleTaskDelete(task.taskId)}/>
                         </CardContent>
                     </Card>
                 ))}
