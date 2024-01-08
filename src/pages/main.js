@@ -218,7 +218,7 @@ const handleNewNoteInputChange = (event) => {
 
 
 
-      const tags = [...new Set(data.flatMap(task => task.tags))]; // Unique tags across all tasks
+      const tags = ["All",...new Set(data.flatMap(task => task.tags))]; // Unique tags across all tasks
     
       useEffect(() => {
         if (data.length > 0) {
