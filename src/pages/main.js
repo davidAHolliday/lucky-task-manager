@@ -13,17 +13,19 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import { TaskModal } from "./components/taskModal";
 import { baseUrl } from "../utils/helperFunctions";
 
 function Dashboard() {
     const [data, setData] = useState([]);
     const [updateMessage, setUpdateMessage] = useState('');
-    const [selectedTask, setSelectedTask] = useState([]);
+    const [selectedTask, setSelectedTask] = useState();
     const [openToast, setOpenToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastSeverity, setToastSeverity] = useState('success');
-    const [displayModal, setDisplayModal] = useState({newTask:false, taskInfo:false})
+    const [displayModal, setDisplayModal] = useState({newTask:false})
+    const [taskProfile, setTaskProfile] = useState(); 
+    const [displayDetails, setDisplayDetails] = useState(false)
+
     // const [displayNewTaskModal,setDisplayNewTaskModal] = useState(false)
     const [newTaskData, setNewTaskData] = useState({
         taskName: '',
@@ -35,6 +37,43 @@ function Dashboard() {
         assignedTo:"",
     });
 const [noteData,setNoteData] = useState({noteText:"",createdBy:""});
+
+
+
+
+const handleShowDetails = (task) =>{
+    console.log("click")
+    setDisplayDetails(true)
+
+        axios.get(`${baseUrl}/task/v1/task/${task.taskId}`)
+        .then(response => {
+                        setTaskProfile(response.data); // Update taskProfile with the updated data
+                    })
+                    .catch(error => {
+                        console.error("Error Fetching Updated Task Data:", error);
+                    });
+                }
+
+    
+
+const handleAddNotes = () =>{
+    const payload = noteData;
+    
+        const url = `${baseUrl}/task/v1/notes/${taskProfile.taskId}/`;
+        axios.put(url, payload)
+            .then(response => {
+                setTaskProfile(response.data)
+                setUpdateMessage(`Note has been added`);
+                handleToast(`Note has been added`, 'success');
+        //Now lets reset the input field
+        setNoteData("")
+    
+        
+})}
+
+//update notes on use effect
+
+
 
 
     function formatDate(inputDate) {
@@ -62,7 +101,6 @@ const [noteData,setNoteData] = useState({noteText:"",createdBy:""});
     };
 
     const handleAddNewTask = () => {
-        // Call your API to add a new task with newTaskData
         handleNewTask(newTaskData);
         setDisplayModal({newTask:false}); // Close the modal after adding the task
     };
@@ -79,9 +117,6 @@ const [noteData,setNoteData] = useState({noteText:"",createdBy:""});
         }
         setOpenToast(false);
     };
-
-
-
 
 
 const handleNewTask = () =>{
@@ -108,30 +143,30 @@ const handleNewTask = () =>{
    }
 
 
-   const handleAddNotes = () =>{
-    const payload = noteData
-    
-    const url = `${baseUrl}/task/v1/notes/${selectedTask.taskId}/`;
-    axios.put(url, payload)
-        .then(response => {
-            setUpdateMessage(`note has been added`);
-            handleToast(`note has been added`, 'success');
-           // Update the local state to reflect the new note
-           const updatedTasks = data.map(task => {
-                return {
-                    ...task,
-                    notes: [...task.notes, { noteText: noteData, timeCreated: new Date().toISOString() }] // Assuming you want to store the timestamp as well
-                };
-            
-        });
+//    const handleAddNotes = () => {
+//     const payload = noteData;
 
-        setData(updatedTasks); // Update the state with the updated tasks
-        })
-        .catch(error => {
-            console.error("Error Fetching Data:", error);
-            handleToast('Failed to add note', 'error');
-        });
-};
+//     const url = `${baseUrl}/task/v1/notes/${selectedTask.taskId}/`;
+//     axios.put(url, payload)
+//         .then(response => {
+//             setUpdateMessage(`Note has been added`);
+//             handleToast(`Note has been added`, 'success');
+
+//             // Assuming you can fetch the updated task details directly after adding a note
+//             axios.get(`${baseUrl}/task/v1/task/${selectedTask.taskId}`)
+//                 .then(response => {
+//                     setTaskProfile(response.data); // Update taskProfile with the updated data
+//                 })
+//                 .catch(error => {
+//                     console.error("Error Fetching Updated Task Data:", error);
+//                 });
+//         })
+//         .catch(error => {
+//             console.error("Error Adding Note:", error);
+//             handleToast('Failed to add note', 'error');
+//         });
+// };
+
 
 
 const handleNewNoteInputChange = (event) => {
@@ -166,14 +201,74 @@ const handleNewNoteInputChange = (event) => {
             .catch(error => {
                 console.error("Error Fetching Data:", error);
             });
-    }, [updateMessage]);
+    }, [updateMessage,noteData]);
+
+
+
 
     return (
         <div className="App">
-              {/*  Modal */}
+              {/*  Info Modal */}
+              { taskProfile  && <>
+        <Dialog open={displayDetails} onClose={() => setDisplayDetails(false)}>
+        <DialogTitle style={{backgroundColor:"lightblue"}}>Task Details</DialogTitle>
+        <DialogContent>
+            <div style ={{height:"500px", width:"700px"}}>
+                <h2>{taskProfile.taskName}</h2>
+                <p><span style={{fontWeight:500, marginRight:"5px"}}>Description:</span>{taskProfile.taskDescription}</p>
+                <p> <span style={{fontWeight:500, marginRight:"5px"}}>Assigned To:</span> {taskProfile.assignedTo || "unknown"} on {formatDate(taskProfile.timeCreated)}</p>
+                <p> Due on: {formatDate(taskProfile.dueDate) || "No Due Date"} </p>
 
-       <TaskModal data={selectedTask} displayNewTaskModal={displayModal} setDisplayNewTaskModal={setDisplayModal} handleAddNotes={handleAddNotes} noteData={noteData}  handleNewNoteInputChange={handleNewNoteInputChange} />
+              {taskProfile.notes && taskProfile.notes.length > 0 ? (
+    <div style={{ marginTop: '20px', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
+        <h4 style={{ marginBottom: '10px' }}>Notes:</h4>
+        {taskProfile.notes.map((note, index) => (
+            <div key={index} style={{ marginBottom: '15px', padding: '10px', borderRadius: '5px', boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.1)', backgroundColor: '#f9f9f9' }}>
+                <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#333' }}>
+                    {formatDate(note.timeCreated)}
+                </p>
+                <p style={{ fontSize: '14px', color: '#555' }}>
+                    {note.noteText}
+                </p>
+            </div>
+        ))}
+    </div>
+) : (
+    <p>No notes available.</p>
+)}
 
+                Add New Note:
+                <TextField
+    autoFocus
+    margin="dense"
+    id="notes"
+    name="notes"
+    label="Notes"
+    type="text"
+    fullWidth
+    value={noteData.noteText}
+    onChange={handleNewNoteInputChange}  // Ensure this is correctly set
+/>
+
+            </div>
+            
+          
+
+      
+        
+        </DialogContent>
+        <DialogActions>
+                    <Button onClick={() => setDisplayModal({taskInfo:false})} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={()=>handleAddNotes()} color="primary">
+                       Add Notes
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>}
+        {/** New Modal*
+ */}
               <Dialog open={displayModal.newTask} onClose={() => setDisplayModal({newTask:false,taskInfo:false})}>
                 <DialogTitle>Add New Task</DialogTitle>
                 <DialogContent>
@@ -270,8 +365,8 @@ const handleNewNoteInputChange = (event) => {
                     key={task.taskId} sx={{ display: "flex", width: "100%", margin: 1 }}>
                         <CardContent ><div 
                          onClick={()=>{
-                            setDisplayModal({taskInfo:true})
-                            setSelectedTask(task)
+                            handleShowDetails(task)
+            
                         }}
                         style={{display:"flex", flexDirection:"column"}}>
                             <div>
@@ -294,9 +389,7 @@ const handleNewNoteInputChange = (event) => {
                             
                             </div>  </CardContent>
                         <CardContent  onClick={()=>{
-                        setDisplayModal({taskInfo:true})
-                        setSelectedTask(task)
-                    }}>
+                                    handleShowDetails(task)                    }}>
                             <Typography variant="h5" component="div">
                                 {task.taskName}
                             </Typography>
@@ -323,8 +416,7 @@ const handleNewNoteInputChange = (event) => {
                         <CardContent>
                             {task.status === "open" && (
                                 <div onClick={() => {
-                                    setSelectedTask({ taskId: task.taskId, value: "" });
-                                    changeStatus("close",task.taskId);
+                                    handleShowDetails(task)                              
                                 }}>
                                     <CheckBoxOutlineBlankIcon />
                                 </div>
