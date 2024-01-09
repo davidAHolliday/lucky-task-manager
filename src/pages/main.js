@@ -22,6 +22,8 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Delete, DeleteForever, ExpandMoreOutlined } from "@mui/icons-material";
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 
 
@@ -418,6 +420,9 @@ const handleNewNoteInputChange = (event) => {
 
 
     return (
+        <> {!filteredTasks ? <div style={{display:"flex" , flexDirection:"column"}}><CircularProgress />
+        <div>Loading</div>
+        </div> :
         <div className="App">
        
                 <FormControl component="fieldset" variant="standard">
@@ -570,17 +575,7 @@ const handleNewNoteInputChange = (event) => {
                         value={newTaskData.taskDescription}
                         onChange={handleNewTaskInputChange}
                     />
-                    {/* <TextField
-                        margin="dense"
-                        id="tags"
-                        name="tags"
-                        label="Tags"
-                        type="text"
-                        fullWidth
-                        value={newTaskData.tags}
-                        onChange={handleNewTaskInputChange}
-                    /> */}
-
+          
         
 <Autocomplete
                 multiple
@@ -857,6 +852,7 @@ const handleNewNoteInputChange = (event) => {
                 </Snackbar>
             </Box>
         </div>
+        }</>
     );
 }
 
