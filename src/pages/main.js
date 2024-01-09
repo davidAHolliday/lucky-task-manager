@@ -45,7 +45,7 @@ function Dashboard() {
     const [switchState, setSwitchState] = useState(true)
     const [deletedItemResponse, setDeletedItemResponse] = useState();
     const [expanded, setExpanded] = useState(false); // State to manage accordion's open/close state
-    const [customTag,setCustomTag] = useState();
+    const [customTag,setCustomTag] = useState(null);
 
 
     const tagContainerStyle = {
@@ -218,22 +218,21 @@ const handleAddNotes = () =>{
 
 
 const handleNewTask = () =>{
-    const customArray = customTag.split(","); // Splitting by comma
+    let tagsToAdd = [...newTaskData.tags]; // Use spread operator to create a new array
+   
+    if(customTag){
+        console.log("hitting custom tag")
+        const customArray = customTag.split(","); 
+        const trimmedArray = customArray.map(tag => tag.trim());
+        tagsToAdd.push(...trimmedArray);
 
-    // Trim each tag to remove any whitespace
-    const trimmedArray = customArray.map(tag => tag.trim());
+    }
+
     
-    const tagWCustomTag = newTaskData.tags;
-    
-    // Concatenate the arrays
-    tagWCustomTag.push(...trimmedArray);
-    
-    console.log("tag to add", trimmedArray);
-    console.log(tagWCustomTag);
 
     const payload = {
         ...newTaskData,
-        tags: tagWCustomTag,
+        tags: tagsToAdd,
         notes: []
     };
 
@@ -259,6 +258,8 @@ const handleNewTask = () =>{
         dueDate: '',
         assignedTo:"",
     })
+
+    setCustomTag(null)
 
    }
 
