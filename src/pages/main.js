@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
-import { Accordion, AccordionDetails, AccordionSummary, Button, CardActionArea, CardContent  } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, CardActionArea, CardContent  } from "@mui/material";
 import Typography from '@mui/material/Typography';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -151,6 +151,16 @@ const handleAddNotes = () =>{
         }));
     };
 
+
+    const handleMultipleTagInputChange = (event, newValue) => {
+        const tags = newValue; // newValue will be an array of selected tags
+       console.log("from method",tags)
+        setNewTaskData(prevState => ({
+            ...prevState,
+            tags: tags // Update the tags field with the selected tags array
+        }));
+    };
+
     const handleAddNewTask = () => {
         handleNewTask(newTaskData);
         setDisplayModal({newTask:false}); // Close the modal after adding the task
@@ -207,11 +217,11 @@ const handleAddNotes = () =>{
 
 
 const handleNewTask = () =>{
-    const tagsArray = newTaskData.tags.split(',').map(tag => tag.trim());
+    // const tagsArray = newTaskData.tags.split(',').map(tag => tag.trim());
 
     const payload = {
         ...newTaskData,
-        tags: tagsArray,
+        tags: newTaskData.tags,
         notes: []
     };
 
@@ -513,7 +523,7 @@ const handleNewNoteInputChange = (event) => {
                         value={newTaskData.taskDescription}
                         onChange={handleNewTaskInputChange}
                     />
-                    <TextField
+                    {/* <TextField
                         margin="dense"
                         id="tags"
                         name="tags"
@@ -522,7 +532,29 @@ const handleNewNoteInputChange = (event) => {
                         fullWidth
                         value={newTaskData.tags}
                         onChange={handleNewTaskInputChange}
+                    /> */}
+
+        
+<Autocomplete
+                multiple
+                id="tags-outlined"
+                options={tags}
+                freeSolo // Allows the user to add tags that are not in the existing list
+                value={newTaskData.tags}
+                onChange={handleMultipleTagInputChange}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        margin="dense"
+                        id="tags"
+                        name="tags"
+                        label="Tags"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
                     />
+                )}
+            />
                 
                     <TextField
                         margin="dense"
