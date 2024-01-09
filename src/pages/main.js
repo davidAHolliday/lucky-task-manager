@@ -674,7 +674,7 @@ const handleNewNoteInputChange = (event) => {
                            <Delete style={{marginTop:"20px"}} onClick={()=>handleTaskDelete(task.taskId)}/>
                         </CardContent>
                     </Card>
-                    <div 
+                  {  task.status == "open" && <div 
   style={{
     marginTop: "-10px",
     width: "100%",
@@ -692,7 +692,7 @@ const handleNewNoteInputChange = (event) => {
 >
   {calculateUrgency(task.timeCreated, task.dueDate)}
 </div>
-
+}
 
 </>
                 ))}
