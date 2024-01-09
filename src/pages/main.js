@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
-import { Button, CardActionArea, CardContent } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Button, CardActionArea, CardContent  } from "@mui/material";
 import Typography from '@mui/material/Typography';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -21,7 +21,8 @@ import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Delete, DeleteForever } from "@mui/icons-material";
+import { Delete, DeleteForever, ExpandMoreOutlined } from "@mui/icons-material";
+
 
 
 
@@ -43,8 +44,20 @@ function Dashboard() {
     const [filteredTasks, setFilteredTasks] = useState(data); // Initially set to all tasks
     const [switchState, setSwitchState] = useState(true)
     const [deletedItemResponse, setDeletedItemResponse] = useState();
+    const [expanded, setExpanded] = useState(false); // State to manage accordion's open/close state
 
 
+    const tagContainerStyle = {
+        display: 'flex',
+        flexWrap: 'wrap',
+        justifyContent: 'center', // Center align tags horizontally
+    };
+
+    const tagStyle = {
+        margin: '5px',
+        flex: '0 0 30%', // 30% width for each tag box
+        cursor: 'pointer',
+    };
 
 
     // const [displayNewTaskModal,setDisplayNewTaskModal] = useState(false)
@@ -57,12 +70,17 @@ function Dashboard() {
         dueDate: '',
         assignedTo:"",
     });
+
+
 const [noteData,setNoteData] = useState({noteText:"",createdBy:""});
 
 
 const users = [...new Set(data.map(task => task.assignedTo))]; // Unique assigned users
 
 
+const handleAccordionChange = () => {
+    setExpanded((prevExpanded) => !prevExpanded); // Toggle accordion state
+};
 
 
 const handleTagClick = (tag) => {
@@ -383,6 +401,24 @@ const handleNewNoteInputChange = (event) => {
                 <h2>{taskProfile.taskName}</h2>
                 <p><span style={{fontWeight:500, marginRight:"5px"}}>Description:</span>{taskProfile.taskDescription}</p>
                 <p> <span style={{fontWeight:500, marginRight:"5px"}}>Assigned To:</span> {taskProfile.assignedTo || "unknown"} on {formatDate(taskProfile.timeCreated)}</p>
+                <p> <span style={{fontWeight:500, marginRight:"5px"}}>Tags:</span>   {taskProfile.tags.map((tag, index) => (
+                                <div
+                                    key={index}
+                                    style={{
+                                        display: 'inline-block',
+                                        backgroundColor: '#007bff',
+                                        color: '#ffffff',
+                                        padding: '5px 10px',
+                                        borderRadius: '16px',
+                                        marginRight: '10px',
+                                        marginBottom: '10px',
+                                        fontSize: '12px',
+                                    }}
+                                >
+                                    {tag}
+                                </div>
+                            ))}</p>
+
                 <p> Due on: {formatDate(taskProfile.dueDate) || "No Due Date"} </p>
 
               {taskProfile.notes && taskProfile.notes.length > 0 ? (
@@ -569,31 +605,47 @@ const handleNewNoteInputChange = (event) => {
     width: "100%",
     overflowX: "auto"
 }}>
-    {tags.map((tag, index) => {
-        const colors = ["#FFCCCC", "#CCFFCC", "#CCCCFF", "#FFCCFF", "#FFFFCC", "#CCFFFF"];
-        const color = colors[index % colors.length];
-        
-        const tagStyle = {
-            opacity:tag==tagValue ?"100%":"60%",
-            backgroundColor: color,
-            padding: "5px 10px",
-            margin: "5px",
-            borderRadius: "5px",
-            color: "black",
-            fontWeight: "bold",
-            cursor: "pointer"  // Add cursor pointer to indicate clickable
-        };
+    
+    <div>
+    <Accordion expanded={expanded} onChange={handleAccordionChange} style={{ width: '100%' }}>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreOutlined />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                >
+                    Tags:  {tagValue}
+                </AccordionSummary>
+                <AccordionDetails>
+                    <div style={tagContainerStyle}>
+                        {tags.map((tag, index) => {
+                            const colors = ["#FFCCCC", "#CCFFCC", "#CCCCFF", "#FFCCFF", "#FFFFCC", "#CCFFFF"];
+                            const color = colors[index % colors.length];
+                            
+                            const individualTagStyle = {
+                                ...tagStyle,
+                                backgroundColor: color,
+                                padding: '5px 10px',
+                                borderRadius: '5px',
+                                color: 'black',
+                                fontWeight: 'bold',
+                                opacity: tag === tagValue ? '100%' : '60%',
+                            };
 
-        return (
-            <div 
-                key={index} 
-                style={tagStyle}
-                onClick={() => handleTagClick(tag)} // Handle tag click
-            >
-                {tag}
-            </div>
-        );
-    })}
+                            return (
+                                <div 
+                                    key={index} 
+                                    style={individualTagStyle}
+                                    onClick={() =>{
+                                         handleTagClick(tag)
+                                    setExpanded(false)}} // Handle tag click
+                                >
+                                    {tag}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </AccordionDetails>
+            </Accordion>        </div>
 </div>
   
             <Box style={{ padding: 0}}    width={"100%"} paddin
@@ -628,14 +680,14 @@ const handleNewNoteInputChange = (event) => {
                             
                             </div>  
                             </CardContent>
-                        <CardContent  style={{width:"30%"}}
+                        <CardContent  style={{width:"60%"}}
                         onClick={()=>{
                                     handleShowDetails(task)                    }}>
                             <Typography variant="h5" component="div">
                                 {task.taskName}
                             </Typography>
                         </CardContent>
-                        <CardContent style={{width:"30%"}}>
+                        {/* <CardContent style={{width:"30%"}}>
                             {task.tags.map((tag, index) => (
                                 <div
                                     key={index}
@@ -653,7 +705,7 @@ const handleNewNoteInputChange = (event) => {
                                     {tag}
                                 </div>
                             ))}
-                        </CardContent>
+                        </CardContent> */}
                         <CardContent style={{width:"20%"}}>
                             {task.status === "open" && (
                                   <div onClick={() => {
