@@ -188,9 +188,12 @@ const handleAddNotes = () =>{
       
         if (dueDate < today) {
           return 'Past Due';
-        } else if (dueDate.getDate() - today.getDate() === 1) {
-          return 'Due Tomorrow';
+        } else if (dueDate.getDate() - today.getDate() === 0) {
+          return 'Due Today';
         }
+        else if (dueDate.getDate() - today.getDate() === 1) {
+            return 'Due Tomorrow';
+          }
           else if (dueDate.getDate() - today.getDate() === 2) {
             return 'Due in 2 Days';
         } else if (dueDate.getDate() - today.getDate() === 3) {
@@ -825,6 +828,7 @@ const handleNewNoteInputChange = (event) => {
                      calculateUrgency(task.timeCreated, task.dueDate) === "Due in 3 Days" ? "#FF8F00" :
                      calculateUrgency(task.timeCreated, task.dueDate) === "Due in 2 Days" ? "#FF6F00" :
                      calculateUrgency(task.timeCreated, task.dueDate) === "Due Tomorrow" ? "#E65100" :
+                     calculateUrgency(task.timeCreated, task.dueDate) === "Due Today" ? "#E65100" :
                      calculateUrgency(task.timeCreated, task.dueDate) === "Past Due" ? "#D32F2F" : "",
     color: calculateUrgency(task.timeCreated, task.dueDate) === "Past Due" ? "white" : "black" // Adjust text color based on urgency
   }}
