@@ -367,6 +367,37 @@ const handleNewNoteInputChange = (event) => {
         setShowDeleteConfirmation(false);
     };
 
+    const handleAddTag = () => {
+        // Get the current value from the TextField
+        const newTag = newTaskData.tags; // Trim to remove any leading or trailing white spaces
+        
+        // Check if the newTag is not empty
+        if (newTag) {
+            // Check if the tag already exists in the array
+            if (!newTaskData.tags.includes(newTag)) {
+                // Add the new tag to the tags array
+                setNewTaskData(prevState => ({
+                    ...prevState,
+                    tags: [...prevState.tags, newTag]
+                }));
+            } else {
+                // Optional: Display a message or alert that the tag already exists
+                alert('Tag already exists!');
+            }
+            
+            // Clear the TextField after adding the tag
+            setNewTaskData(prevState => ({
+                ...prevState,
+                tags: '', // Clear the tags TextField
+            }));
+        }
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            handleAddTag(); // Call your function to add the tag
+        }
+    };
     
 
 
@@ -552,6 +583,8 @@ const handleNewNoteInputChange = (event) => {
                         type="text"
                         fullWidth
                         variant="outlined"
+                        onKeyDown={handleKeyDown} // Listen for key down events
+
                     />
                 )}
             />
