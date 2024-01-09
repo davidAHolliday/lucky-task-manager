@@ -218,10 +218,18 @@ const handleAddNotes = () =>{
 
 
 const handleNewTask = () =>{
-    const tagWCustomTag = newTaskData.tags
-    tagWCustomTag.push(customTag)
-    console.log("tag to add", customTag)
-    console.log(tagWCustomTag)
+    const customArray = customTag.split(","); // Splitting by comma
+
+    // Trim each tag to remove any whitespace
+    const trimmedArray = customArray.map(tag => tag.trim());
+    
+    const tagWCustomTag = newTaskData.tags;
+    
+    // Concatenate the arrays
+    tagWCustomTag.push(...trimmedArray);
+    
+    console.log("tag to add", trimmedArray);
+    console.log(tagWCustomTag);
 
     const payload = {
         ...newTaskData,
@@ -595,7 +603,7 @@ const handleNewNoteInputChange = (event) => {
                         margin="dense"
                         id="tags"
                         name="tags"
-                        label="Tags"
+                        label="Custom Tag (Seperate by comma)"
                         type="text"
                         fullWidth
                         value={customTag}
