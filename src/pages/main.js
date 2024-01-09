@@ -562,8 +562,8 @@ const handleNewNoteInputChange = (event) => {
   
             <Box style={{ padding: 0}}    width={"100%"} paddin
              display="flex" flexDirection={"column"} justifyContent="center" alignItems="center" p={5}>
-                {filteredTasks.map(task => (
-                    <Card style={{textDecoration: task.status === "close"?"line-through":""}}
+                {filteredTasks.map((task, index) => (
+                    <Card style={{backgroundColor:index % 2 ==0? "#C4D4E0":"",textDecoration: task.status === "close"?"line-through":""}}
                     key={task.taskId} sx={{ display: "flex", minWidth: "100%", margin: 1 }}>
                         <CardContent style={{width:"20%"}}>
                             <div  
