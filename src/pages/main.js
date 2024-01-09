@@ -151,6 +151,42 @@ const handleAddNotes = () =>{
         setOpenToast(false);
     };
 
+    const calculateUrgency = (timeCreatedISO, dueDateISO) => {
+        const timeCreated = new Date(timeCreatedISO);
+        const dueDate = new Date(dueDateISO);
+        const today = new Date();
+      
+      
+        if (dueDate < today) {
+          return 'Past Due';
+        } else if (dueDate.getDate() - today.getDate() === 1) {
+          return 'Due Tomorrow';
+        }
+          else if (dueDate.getDate() - today.getDate() === 2) {
+            return 'Due in 2 Days';
+        } else if (dueDate.getDate() - today.getDate() === 3) {
+          return 'Due in 3 Days';
+        } else if (dueDate.getDate() - today.getDate() === 4) {
+            return 'Due in 4 Days';
+        } else if (dueDate.getDate() - today.getDate() === 5) {
+            return 'Due in 5 Days';
+        } else if (dueDate.getDate() - today.getDate() === 6) {
+            return 'Due in 6 Days';
+        } else if (dueDate.getDate() - today.getDate() == 7) {
+          return 'Due in a Week';
+        } else {
+          return '';
+        }
+      };
+      
+      // Example usage with ISO 8601 formatted date strings:
+      const timeCreatedISO = "2024-01-01T02:58:23.293+00:00"; // Replace with the actual time created
+      const dueDateISO = "2024-01-09T02:58:23.293+00:00"; // Replace with the actual due date
+      console.log(calculateUrgency(timeCreatedISO, dueDateISO)); // Output will categorize the item based on its due date relative to the current date
+      
+      
+
+
 
 const handleNewTask = () =>{
     const tagsArray = newTaskData.tags.split(',').map(tag => tag.trim());
@@ -563,6 +599,7 @@ const handleNewNoteInputChange = (event) => {
             <Box style={{ padding: 0}}    width={"100%"} paddin
              display="flex" flexDirection={"column"} justifyContent="center" alignItems="center" p={5}>
                 {filteredTasks.map((task, index) => (
+                    <>
                     <Card style={{backgroundColor:index % 2 ==0? "#C4D4E0":"",textDecoration: task.status === "close"?"line-through":""}}
                     key={task.taskId} sx={{ display: "flex", minWidth: "100%", margin: 1 }}>
                         <CardContent style={{width:"20%"}}>
@@ -637,6 +674,27 @@ const handleNewNoteInputChange = (event) => {
                            <Delete style={{marginTop:"20px"}} onClick={()=>handleTaskDelete(task.taskId)}/>
                         </CardContent>
                     </Card>
+                    <div 
+  style={{
+    marginTop: "-10px",
+    width: "100%",
+    marginBottom: "5px",
+    backgroundColor: calculateUrgency(task.timeCreated, task.dueDate) === "Due in a Week" ? "#FFF59D" :
+                     calculateUrgency(task.timeCreated, task.dueDate) === "Due in 6 Days" ? "#FFCC80" :
+                     calculateUrgency(task.timeCreated, task.dueDate) === "Due in 5 Days" ? "#FFB74D" :
+                     calculateUrgency(task.timeCreated, task.dueDate) === "Due in 4 Days" ? "#FFA726" :
+                     calculateUrgency(task.timeCreated, task.dueDate) === "Due in 3 Days" ? "#FF8F00" :
+                     calculateUrgency(task.timeCreated, task.dueDate) === "Due in 2 Days" ? "#FF6F00" :
+                     calculateUrgency(task.timeCreated, task.dueDate) === "Due Tomorrow" ? "#E65100" :
+                     calculateUrgency(task.timeCreated, task.dueDate) === "Past Due" ? "#D32F2F" : "",
+    color: calculateUrgency(task.timeCreated, task.dueDate) === "Past Due" ? "white" : "black" // Adjust text color based on urgency
+  }}
+>
+  {calculateUrgency(task.timeCreated, task.dueDate)}
+</div>
+
+
+</>
                 ))}
                 <Snackbar
                 style={{padding:"80px"}}
