@@ -45,6 +45,7 @@ function Dashboard() {
     const [switchState, setSwitchState] = useState(true)
     const [deletedItemResponse, setDeletedItemResponse] = useState();
     const [expanded, setExpanded] = useState(false); // State to manage accordion's open/close state
+    const [customTag,setCustomTag] = useState();
 
 
     const tagContainerStyle = {
@@ -217,11 +218,14 @@ const handleAddNotes = () =>{
 
 
 const handleNewTask = () =>{
-    // const tagsArray = newTaskData.tags.split(',').map(tag => tag.trim());
+    const tagWCustomTag = newTaskData.tags
+    tagWCustomTag.push(customTag)
+    console.log("tag to add", customTag)
+    console.log(tagWCustomTag)
 
     const payload = {
         ...newTaskData,
-        tags: newTaskData.tags,
+        tags: tagWCustomTag,
         notes: []
     };
 
@@ -583,11 +587,20 @@ const handleNewNoteInputChange = (event) => {
                         type="text"
                         fullWidth
                         variant="outlined"
-                        onKeyDown={handleKeyDown} // Listen for key down events
 
                     />
                 )}
             />
+            <TextField
+                        margin="dense"
+                        id="tags"
+                        name="tags"
+                        label="Tags"
+                        type="text"
+                        fullWidth
+                        value={customTag}
+                        onChange={val=>setCustomTag(val.target.value)}
+                    />
                 
                     <TextField
                         margin="dense"
