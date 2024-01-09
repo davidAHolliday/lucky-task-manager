@@ -420,7 +420,7 @@ const handleNewNoteInputChange = (event) => {
 
 
     return (
-        <> {!filteredTasks ? <div style={{display:"flex" , flexDirection:"column"}}><CircularProgress />
+        <> {data.length == 0? <div style={{display:"flex" , flexDirection:"column"}}><CircularProgress />
         <div>Loading</div>
         </div> :
         <div className="App">
