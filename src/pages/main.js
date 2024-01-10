@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios, { HttpStatusCode } from "axios";
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
 import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, CardActionArea, CardContent, formLabelClasses  } from "@mui/material";
@@ -23,6 +23,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Delete, DeleteForever, ExpandMoreOutlined } from "@mui/icons-material";
 import CircularProgress from '@mui/material/CircularProgress';
+import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 
 
 
@@ -49,7 +50,7 @@ function Dashboard() {
     const [deletedItemResponse, setDeletedItemResponse] = useState();
     const [expanded, setExpanded] = useState(false); // State to manage accordion's open/close state
     const [customTag,setCustomTag] = useState(null);
-
+    const [displayChecklist,setDisplayChecklist] = useState(false)
 
     const tagContainerStyle = {
         display: 'flex',
@@ -77,6 +78,7 @@ function Dashboard() {
 
 
 const [noteData,setNoteData] = useState({noteText:"",createdBy:""});
+const [checklistData,setChecklistData] = useState({itemText:"",index:null,doneStatus:false})
 
 
 const users = [...new Set(data.map(task => task.assignedTo))]; // Unique assigned users
@@ -119,6 +121,20 @@ const handleAddNotes = () =>{
     
         
 })}
+
+const handleNewChecklistSubmit = ()=>{
+    const payload = checklistData;
+    
+    const url = `${baseUrl}/task/v1/checklist/${taskProfile.taskId}`;
+    axios.put(url, payload)
+        .then(response => {
+            setTaskProfile(response.data)
+    //Now lets reset the input field
+    setChecklistData({itemText:"",index:null,doneStatus:false})
+
+    
+})
+}
 
 //update notes on use effect
 
@@ -239,7 +255,8 @@ const handleNewTask = () =>{
     const payload = {
         ...newTaskData,
         tags: tagsToAdd,
-        notes: []
+        notes: [],
+        checkListItems: []
     };
 
     const url = `${baseUrl}/task/v1/`;
@@ -260,6 +277,7 @@ const handleNewTask = () =>{
         taskDescription: '',
         tags: [],
         notes: [],
+        checkListItems:[],
         status: 'open',
         dueDate: '',
         assignedTo:"",
@@ -275,6 +293,14 @@ const handleNewNoteInputChange = (event) => {
 
 
 };
+
+
+ const handleAddCheckListChange = (event,index)=>{
+    const { value } = event.target;
+    setChecklistData((prev)=>({index:index,itemText:value,doneStatus:false}));
+
+
+ }
     const changeStatus = (status,taskId) => {
         const url = `${baseUrl}/task/v1/task/${taskId}/${status}`;
         axios.put(url, [])
@@ -369,6 +395,23 @@ const handleNewNoteInputChange = (event) => {
         //Pop Up Edit Data Modal
         setDisplayEditModal(true)
     }
+
+
+const handleCheckboxChange = (index,status) =>{
+    
+    const url = `${baseUrl}/task/v1/checklist/${taskProfile.taskId}/${index}/${!status}`;
+    axios.put(url, [])
+        .then(response => {
+            setUpdateMessage(`Marked Done`);
+            setTaskProfile(response.data)
+
+        })
+        .catch(error => {
+            console.error("Error Fetching Data:", error);
+            handleToast('Failed to update task status', 'error');
+        });
+
+}
 
     const handleEditSubmit = (id) =>{
         let tagsToAdd = [...newTaskData.tags]; // Use spread operator to create a new array
@@ -466,13 +509,6 @@ const handleNewNoteInputChange = (event) => {
         }
     };
 
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            handleAddTag(); // Call your function to add the tag
-        }
-    };
-    
-
 
     return (
         <> {data.length == 0? <div style={{display:"flex" , flexDirection:"column"}}><CircularProgress />
@@ -541,9 +577,97 @@ const handleNewNoteInputChange = (event) => {
 
                 <p> Due on: {formatDate(taskProfile.dueDate) || "No Due Date"} </p>
 
+                <div 
+                style={{ 
+                    height: '50px', 
+                    backgroundColor: '#007bff', 
+                    color:"#fff",
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    cursor: 'pointer', 
+                    borderBottom: '1px solid #ccc' // Add border to separate the dropdown bar from the content below
+                }} 
+                onClick={() => setDisplayChecklist(prev => !prev)} // Toggle dropdown visibility on click
+            >
+                <span style={{marginRight:"10px"}}>Checklist</span> <ArrowDropDownCircleIcon/>
+            </div>{displayChecklist &&<> 
+    <div style={{ marginTop: '20px', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
+        {taskProfile.checkListItems.map((item, index) =>{
+            const strikeout = (item.doneStatus == true ? "Line-through" : "None")
+            return(
+            <div 
+                key={index} 
+                style={{ 
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',  // Align items vertically in the center
+                    marginBottom: '5px', 
+                    padding: '5px', 
+                    borderRadius: '5px', 
+                }}
+            >
+                <div>
+                    <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#333',textDecoration: strikeout , textDecorationColor:"red" }}>
+                    {item.index} {item.itemText}
+                    </p>
+                  
+                </div>
+                <div>
+                    {/* Checkbox input */}
+                    <input 
+                        type="checkbox" 
+                        checked={item.doneStatus}  // Set the checked state based on the doneStatus
+                        onChange={(e) => handleCheckboxChange(item.index,item.doneStatus)}  // Call handleCheckboxChange on checkbox change
+                    />
+                </div>
+            </div>
+        )})}
+    </div>
+
+
+<div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+    {/* TextField Component */}
+    <TextField
+        autoFocus
+        margin="dense"
+        id="clItem"
+        name="clItem"
+        label="Add Item To List"
+        type="text"
+        style={{ flex: 1, marginRight: '10px', height: '50px' }}  // Set flex and height properties
+        value={checklistData.itemText}
+        onChange={(val)=>handleAddCheckListChange(val,taskProfile.checkListItems.length+1)}  // Ensure this is correctly set
+    />
+    
+    {/* Button Component */}
+    <button onClick={handleNewChecklistSubmit}
+        style={{ 
+            marginTop:"5px",
+            height: '50px',  // Set the height to match the TextField height
+            padding: '0 20px',  // Add padding for better aesthetics
+            backgroundColor: '#007bff',  // Example background color
+            color: '#fff',  // Example text color
+            border: 'none',  // Remove border
+            borderRadius: '5px',  // Add border radius for rounded corners
+            cursor: 'pointer'  // Add pointer cursor on hover
+        }}
+    >
+        +
+    </button>
+</div>
+
+ </>}
+
+
+
+              
+
+    
               {taskProfile.notes && taskProfile.notes.length > 0 ? (
     <div style={{ marginTop: '20px', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
-        <h4 style={{ marginBottom: '10px' }}>Notes:</h4>
+        {/* <h4 style={{ marginBottom: '10px' }}>Notes:</h4> */}
+        
         {taskProfile.notes.map((note, index) => (
     <div 
         key={index} 
