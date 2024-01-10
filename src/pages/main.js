@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
-import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, CardActionArea, CardContent  } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, CardActionArea, CardContent, formLabelClasses  } from "@mui/material";
 import Typography from '@mui/material/Typography';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -37,7 +37,8 @@ function Dashboard() {
     const [openToast, setOpenToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastSeverity, setToastSeverity] = useState('success');
-    const [displayModal, setDisplayModal] = useState({newTask:false})
+    const [displayNewTaskModal, setDisplayNewTaskModal] = useState(false)
+    const [displayEditModal, setDisplayEditModal] = useState(false)
     const [taskProfile, setTaskProfile] = useState(); 
     const [displayDetails, setDisplayDetails] = useState(false)
     const [filterValue, setFilterValue] = useState("All"); // The selected user or tag to filter by
@@ -166,7 +167,7 @@ const handleAddNotes = () =>{
 
     const handleAddNewTask = () => {
         handleNewTask(newTaskData);
-        setDisplayModal({newTask:false}); // Close the modal after adding the task
+        setDisplayNewTaskModal(false); // Close the modal after adding the task
     };
 
     const handleToast = (message, severity) => {
@@ -362,6 +363,60 @@ const handleNewNoteInputChange = (event) => {
             });
     };
 
+    const handleEditTask =(taskProfile)=>{
+        setDisplayDetails(false)        //Set Existing Data
+        setNewTaskData(taskProfile);
+        //Pop Up Edit Data Modal
+        setDisplayEditModal(true)
+    }
+
+    const handleEditSubmit = (id) =>{
+        let tagsToAdd = [...newTaskData.tags]; // Use spread operator to create a new array
+       
+        if(customTag){
+            console.log("hitting custom tag")
+            const customArray = customTag.split(","); 
+            const trimmedArray = customArray.map(tag => tag.trim());
+            tagsToAdd.push(...trimmedArray);
+    
+        }
+    
+        const payload = {
+            ...newTaskData,
+            tags: tagsToAdd,
+            notes: []
+        };
+
+           
+ 
+        const url = `${baseUrl}/task/v1/task/update/${id}`;
+        axios.put(url, payload)
+            .then(response => {
+                setUpdateMessage(`New Task has been Updated`);
+                handleToast(`New Task has been added`, 'success');
+                setSelectedTask({ taskId: '', value: '' });
+                setDisplayEditModal(false)
+            })
+            .catch(error => {
+                console.error("Error Fetching Data:", error);
+                handleToast('Failed to update task status', 'error');
+            });
+    
+            //Reset Data
+        setNewTaskData({
+            taskName: '',
+            taskDescription: '',
+            tags: [],
+            notes: [],
+            status: 'open',
+            dueDate: '',
+            assignedTo:"",
+        })
+    
+        setCustomTag(null)
+    
+       }
+
 
 
     const confirmDelete = () => {
@@ -459,6 +514,9 @@ const handleNewNoteInputChange = (event) => {
         <Dialog open={displayDetails} onClose={() => setDisplayDetails(false)}>
         <DialogTitle style={{backgroundColor:"lightblue"}}>Task Details</DialogTitle>
         <DialogContent>
+            <div onClick={()=>{
+                handleEditTask(taskProfile)
+                setDisplayNewTaskModal(false)}}style={{marginTop:"25px",color:"blue"}}>Edit</div>
             <div style ={{height:"500px", width:"300px"}}>
                 <h2>{taskProfile.taskName}</h2>
                 <p><span style={{fontWeight:500, marginRight:"5px"}}>Description:</span>{taskProfile.taskDescription}</p>
@@ -547,12 +605,9 @@ const handleNewNoteInputChange = (event) => {
         </>}
         {/** New Modal*
  */}
-              <Dialog open={displayModal.newTask} onClose={() => setDisplayModal({newTask:false,taskInfo:false})}>
+              <Dialog open={displayNewTaskModal} onClose={() => setDisplayNewTaskModal(false)}>
                 <DialogTitle>Add New Task</DialogTitle>
                 <DialogContent>
-
-
-   
 
                     <TextField
                         autoFocus
@@ -644,7 +699,7 @@ const handleNewNoteInputChange = (event) => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setDisplayModal({newTask:false})} color="primary">
+                    <Button onClick={() => setDisplayNewTaskModal(false)} color="primary">
                         Cancel
                     </Button>
                     <Button onClick={handleAddNewTask} color="primary">
@@ -653,10 +708,115 @@ const handleNewNoteInputChange = (event) => {
                 </DialogActions>
             </Dialog>
 
+              {/** Update task Modal*
+ */}
+              <Dialog open={displayEditModal} onClose={() => setDisplayEditModal(false)}>
+                <DialogTitle>Edit Task</DialogTitle>
+                <DialogContent>
+
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="taskName"
+                        name="taskName"
+                        label="Task Name"
+                        type="text"
+                        fullWidth
+                        value={newTaskData.taskName}
+                        onChange={handleNewTaskInputChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        id="taskDescription"
+                        name="taskDescription"
+                        label="Task Description"
+                        type="text"
+                        fullWidth
+                        value={newTaskData.taskDescription}
+                        onChange={handleNewTaskInputChange}
+                    />
+          
+        
+<Autocomplete
+                multiple
+                id="tags-outlined"
+                options={tags}
+                freeSolo // Allows the user to add tags that are not in the existing list
+                value={newTaskData.tags}
+                onChange={handleMultipleTagInputChange}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        margin="dense"
+                        id="tags"
+                        name="tags"
+                        label="Tags"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
+
+                    />
+                )}
+            />
+            <TextField
+                        margin="dense"
+                        id="tags"
+                        name="tags"
+                        label="Custom Tag (Seperate by comma)"
+                        type="text"
+                        fullWidth
+                        value={customTag}
+                        onChange={val=>setCustomTag(val.target.value)}
+                    />
+                
+                    <TextField
+                        margin="dense"
+                        id="status"
+                        name="status"
+                        label="Status"
+                        type="text"
+                        fullWidth
+                        value={newTaskData.status}
+                        onChange={handleNewTaskInputChange}
+                    />
+                      <TextField
+                        margin="dense"
+                        id="assignedTo"
+                        name="assignedTo"
+                        label="Assign To"
+                        type="text"
+                        fullWidth
+                        value={newTaskData.assignedTo}
+                        onChange={handleNewTaskInputChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        id="dueDate"
+                        name="dueDate"
+                        label="Due Date"
+                        type="date"
+                        fullWidth
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        value={ newTaskData.dueDate ? newTaskData.dueDate.split('T')[0] : ''}
+                        onChange={handleNewTaskInputChange}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDisplayEditModal(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={()=>handleEditSubmit(newTaskData.taskId)} color="primary">
+                        Update Task
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <header className="App-header">
                 Dashboard
             </header>
-            <div onClick={()=>setDisplayModal({newTask:true})} class="add-button">
+            <div onClick={()=>setDisplayNewTaskModal(true)} class="add-button">
     <span class="plus-sign">+</span>
     <span class="button-text">Add</span>
   </div>
