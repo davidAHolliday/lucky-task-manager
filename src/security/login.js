@@ -1,24 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import "./security.css"
 
-const Login = ({onLogin}) => {
+const Login = ({ onLogin }) => {
   const [input, setInput] = useState('');
   const correctPin = '2019';
 
-
-useEffect(()=>{
-  const isAuthenticated = sessionStorage.getItem("auth")
-  if(isAuthenticated==="true"){
-    window.location.href = '/task-manager';
-  }
-
-
-
-},[])
+  useEffect(() => {
+    const isAuthenticated = sessionStorage.getItem("auth")
+    if (isAuthenticated === "true") {
+      window.location.href = '/task-manager';
+    }
+  }, [])
 
   const handleNumberClick = (index) => {
-    console.log(index + 1);
-    setInput((prevInput) => prevInput + (index + 1));
+    const enteredNumber = index ; // Correctly adjust the entered number
+    console.log(enteredNumber);
+    setInput((prevInput) => prevInput + enteredNumber);
 
     const dotIndex = input.length; // Adjust indexing here
 
@@ -32,26 +29,68 @@ useEffect(()=>{
     console.log("code entered", input);
     if (input !== correctPin) {
       document.body.classList.add('wrong');
-      console.log("wrong");
+      setTimeout(()=>{
+        document.body.classList.remove('wrong', 'correct');
+        setInput('');
+         document.querySelectorAll('.dot').forEach((dot) => {
+               dot.classList.remove('active', 'wrong', 'correct');
+              });
+      },1000)
+     
     } else {
       document.body.classList.add('correct');
       console.log("correct");
-      onLogin(input)
+      onLogin(input);
     }
-
-    setTimeout(() => {
-      document.body.classList.remove('wrong', 'correct');
-      setInput('');
-      document.querySelectorAll('.dot').forEach((dot) => {
-        dot.classList.remove('active', 'wrong', 'correct');
-      });
-    }, 1000);
-  };
+  }
 
   const handleNumberButtonClick = (index) => {
-    document.getElementById(`number-${index}`).classList.add('grow');
+    console.log("check index,", index);
+    const numberElement = document.getElementById(`number-${index}`);
+    
+    if (numberElement) {
+      numberElement.classList.add('grow');
+    }
+  
     handleNumberClick(index);
+  
+    setTimeout(() => {
+      const dotIndex = input.length;
+      const dotElement = document.getElementById(`dot-${dotIndex}`);
+      console.log(dotElement);
+  
+      if (dotElement) {
+        dotElement.classList.add('active');
+      }
+  
+    //  if (input.length ==4 ) {
+    //     console.log("code entered", input);
+    //     setTimeout(() => {
+    //       if (input !== correctPin) {
+    //         document.body.classList.add('wrong');
+    //         console.log("wrong");
+    //       } else {
+    //         document.body.classList.add('correct');
+    //         console.log("correct");
+    //         onLogin(input);
+    //       }
+    //     }, 500);
+  
+    //     setTimeout(() => {
+    //       document.body.classList.remove('wrong', 'correct');
+    //       setInput('');
+    //       document.querySelectorAll('.dot').forEach((dot) => {
+    //         dot.classList.remove('active', 'wrong', 'correct');
+    //       });
+    //     }, 1000);
+    //   }
+  
+      if (numberElement) {
+        numberElement.classList.remove('grow');
+      }
+    }, 1000);
   };
+  
 
   return (
     <div id="pin" className="pin-container">
@@ -62,16 +101,88 @@ useEffect(()=>{
       </div>
       <p>Enter the password</p>
       <div className="numbers">
-        {[...Array(9).keys()].map((index) => (
-          <div
-            key={index}
-            id={`number-${index}`}
+      <div
+            key={1}
+            id={`number-${1}`}
             className="number"
-            onClick={() => handleNumberButtonClick(index)}
+            onClick={() => handleNumberButtonClick(1)}
           >
-            {index + 1}
+            {1}
           </div>
-        ))}
+
+          <div
+            key={2}
+            id={`number-${2}`}
+            className="number"
+            onClick={() => handleNumberButtonClick(2)}
+          >
+            {2}
+          </div>
+          <div
+            key={3}
+            id={`number-${3}`}
+            className="number"
+            onClick={() => handleNumberButtonClick(3)}
+          >
+            {3}
+          </div>
+          <div
+            key={4}
+            id={`number-${4}`}
+            className="number"
+            onClick={() => handleNumberButtonClick(4)}
+          >
+            {4}
+          </div>
+          <div
+            key={5}
+            id={`number-${5}`}
+            className="number"
+            onClick={() => handleNumberButtonClick(5)}
+          >
+            {5}
+          </div>
+          <div
+            key={6}
+            id={`number-${6}`}
+            className="number"
+            onClick={() => handleNumberButtonClick(6)}
+          >
+            {6}
+          </div>
+          <div
+            key={7}
+            id={`number-${7}`}
+            className="number"
+            onClick={() => handleNumberButtonClick(7)}
+          >
+            {7}
+          </div>
+          <div
+            key={8}
+            id={`number-${8}`}
+            className="number"
+            onClick={() => handleNumberButtonClick(8)}
+          >
+            {8}
+          </div>
+          <div
+            key={9}
+            id={`number-${9}`}
+            className="number"
+            onClick={() => handleNumberButtonClick(9)}
+          >
+            {9}
+          </div>
+          <div
+            key={0}
+            id={`number-${0}`}
+            className="number"
+            onClick={() => handleNumberButtonClick(0)}
+          >
+            {0}
+          </div>
+  
       </div>
       <button className="enter-button" onClick={handleEnterClick}>
         Enter
@@ -79,4 +190,5 @@ useEffect(()=>{
     </div>
   );
 };
+
 export default Login;
