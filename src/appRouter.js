@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate  } from 'react-router-dom';
 import Dashboard from './pages/main';
 import Login from './security/login';
+import GuestProjections from './pages/components/guestProjections';
 
 const AppRouter = () => {
 
@@ -50,8 +51,9 @@ const AppRouter = () => {
       <Routes>
       <Route path="/" element={<Login onLogin={handleLogin} />} />
       <Route path="/task-manager" element={<PrivateRoute element={<Dashboard/>} />} />
+      <Route path="/guest-projections" element={<PrivateRoute element={<GuestProjections/>} />} />
 
-\        {/* <Route path="/task-manager" element={<PrivateRoute element={<App />} />} /> */}
+
       </Routes>
     </Router>
   );
