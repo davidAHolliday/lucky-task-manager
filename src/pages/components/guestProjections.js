@@ -5,9 +5,9 @@ const containerStyle = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
+    // justifyContent: 'center',
     padding: '20px',
-    backgroundColor:"blue",
+    backgroundColor:"white",
     height:"100vh"
   };
   
@@ -21,15 +21,18 @@ const containerStyle = {
   const thStyle = {
     border: '1px solid #ddd',
     padding: '8px',
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#176B87',
+    color:"white"
   };
   
   const tdStyle = {
+    fontSize:"large",
     border: '1px solid #ddd',
     padding: '8px',
   };
   
   const inputStyle = {
+    fontSize:'large',
     width: '40px',
     marginBottom: '5px', // Added margin for better spacing
   };
@@ -81,8 +84,6 @@ function GuestProjections() {
   const handleNavigate =()=>{
     window.location.href = '/task-manager'
    }
-
-
 
   const handleInputChange = (type, e) => {
     if (type === 'prev') {
@@ -146,6 +147,16 @@ function GuestProjections() {
       setPercentageDifference(null);
     }
   };
+
+  const label = [
+    {value:"mon",label:"Monday"},
+    {value:"tue",label:"Tuesday"},
+    {value:"wed",label:"Wednesday"},
+    {value:"thur",label:"Thursday"},
+    {value:"fri",label:"Friday"},
+    {value:"sat",label:"Saturday"},
+    {value:"sun",label:"Sunday"},
+  ]
 
   return (
     <div style={containerStyle}>
@@ -211,129 +222,40 @@ function GuestProjections() {
       <table style={tableStyle}>
         <thead>
           <tr>
-            <th style={thStyle}>Description</th>
-            <th style={thStyle}>Mon</th>
-            <th style={thStyle}>Tue</th>
-            <th style={thStyle}>Wed</th>
-            <th style={thStyle}>Thurs</th>
-            <th style={thStyle}>Fri</th>
-            <th style={thStyle}>Sat</th>
-            <th style={thStyle}>Sun</th>
+          <th style={thStyle}>Day</th>
+        <th style={thStyle}>Projections</th>
+      <th style={thStyle}>Modified</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td style={tdStyle}>Projections</td>
-            <td style={tdStyle}>
-              <input
-                type="text"
-                value={daysValue.mon}
-                onChange={(e) => handleInputChange('mon', e)}
-                style={inputStyle}
-              />
-            </td>
-            <td style={tdStyle}>
-              <input
-                type="text"
-                value={daysValue.tue}
-                onChange={(e) => handleInputChange('tue', e)}
-                style={inputStyle}
-              />
-            </td>
+         
+         {label.map((day,index)=>{
+            return(
+                <tr style={{backgroundColor:index % 2 == 0? "#86B6F6":"#B4D4FF"}}>
+                <td style={tdStyle}>{day.label}</td>
+                <td style={tdStyle}>
+                  <input
+                    type="text"
+                    value={daysValue[day.value]}
+                    onChange={(e) => handleInputChange(day.value, e)}
+                    style={inputStyle}
+                  />
+    
+                </td>
+    
+                <td style={tdStyle}>
+                  {daysValue[day.value] === '' || isNaN(daysValue[day.value])
+                    ? '-'
+                    : Math.floor(
+                        parseFloat(daysValue[day.value]) * (1 + percentageDiff / 100)
+                      )}
+                </td>
+              </tr>
+            ) })}
 
-            <td style={tdStyle}>
-              <input
-                type="text"
-                value={daysValue.wed}
-                onChange={(e) => handleInputChange('wed', e)}
-                style={inputStyle}
-              />
-            </td>
-            <td style={tdStyle}>
-              <input
-                type="text"
-                value={daysValue.thur}
-                onChange={(e) => handleInputChange('thur', e)}
-                style={inputStyle}
-              />
-            </td>
-            <td style={tdStyle}>
-              <input
-                type="text"
-                value={daysValue.fri}
-                onChange={(e) => handleInputChange('fri', e)}
-                style={inputStyle}
-              />
-            </td>
-            <td style={tdStyle}>
-              <input
-                type="text"
-                value={daysValue.sat}
-                onChange={(e) => handleInputChange('sat', e)}
-                style={inputStyle}
-              />
-            </td>
-            <td style={tdStyle}>
-              <input
-                type="text"
-                value={daysValue.sun}
-                onChange={(e) => handleInputChange('sun', e)}
-                style={inputStyle}
-              />
-            </td>
-          </tr>
-          <tr>
-            <td style={tdStyle}>Modified</td>
-            <td style={tdStyle}>
-              {daysValue.mon === '' || isNaN(daysValue.mon)
-                ? '-'
-                : Math.floor(
-                    parseFloat(daysValue.mon) * (1 + percentageDiff / 100)
-                  )}
-            </td>
-            <td style={tdStyle}>
-              {daysValue.tue === '' || isNaN(daysValue.tue)
-                ? '-'
-                : Math.floor(
-                    parseFloat(daysValue.tue) * (1 + percentageDiff / 100)
-                  )}
-            </td>
-            <td style={tdStyle}>
-              {daysValue.wed === '' || isNaN(daysValue.wed)
-                ? '-'
-                : Math.floor(
-                    parseFloat(daysValue.wed) * (1 + percentageDiff / 100)
-                  )}
-            </td>
-            <td style={tdStyle}>
-              {daysValue.thur === '' || isNaN(daysValue.thur)
-                ? '-'
-                : Math.floor(
-                    parseFloat(daysValue.thur) * (1 + percentageDiff / 100)
-                  )}
-            </td>
-            <td style={tdStyle}>
-              {daysValue.fri === '' || isNaN(daysValue.fri)
-                ? '-'
-                : Math.floor(
-                    parseFloat(daysValue.fri) * (1 + percentageDiff / 100)
-                  )}
-            </td>
-            <td style={tdStyle}>
-              {daysValue.sat === '' || isNaN(daysValue.sat)
-                ? '-'
-                : Math.floor(
-                    parseFloat(daysValue.sat) * (1 + percentageDiff / 100)
-                  )}
-            </td>
-            <td style={tdStyle}>
-              {daysValue.sun === '' || isNaN(daysValue.sun)
-                ? '-'
-                : Math.floor(
-                    parseFloat(daysValue.sun) * (1 + percentageDiff / 100)
-                  )}
-            </td>
-          </tr>
+
+   
+           
         </tbody>
       </table>
     </div>
