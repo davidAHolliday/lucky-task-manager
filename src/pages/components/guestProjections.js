@@ -90,16 +90,6 @@ function GuestProjections() {
 
 
 
-  useEffect(() => {
-    // Add a class to the body element when the component mounts
-    document.body.classList.add('landscape-mode');
-
-    // Cleanup: Remove the class when the component unmounts
-    return () => {
-      document.body.classList.remove('landscape-mode');
-    };
-  }, []);
-
 
   const handleInputChange = (type, e) => {
     if (type === 'prev') {
@@ -165,7 +155,7 @@ function GuestProjections() {
   };
 
   return (
-    <div style={{ ...(containerStyle), ...(document.body.classList.contains('landscape-mode') && landscapeStyles) }}>
+    <div style={containerStyle}>
       <table style={tableStyle}>
         <thead>
           <tr>
