@@ -23,7 +23,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import { Delete, DeleteForever, ExpandMoreOutlined } from "@mui/icons-material";
 import CircularProgress from '@mui/material/CircularProgress';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
-
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 
 
@@ -460,6 +460,9 @@ const handleCheckboxChange = (index,status) =>{
        }
 
 
+       const handleNavigate =()=>{
+        window.location.href = '/guest-projections'
+       }
 
     const confirmDelete = () => {
         // Perform the delete action here
@@ -515,16 +518,26 @@ const handleCheckboxChange = (index,status) =>{
         </div> :
         <div className="App">
        
-                <FormControl component="fieldset" variant="standard">
-      <FormGroup>
-        <FormControlLabel
-          control={
-            <Switch checked={switchState} onChange={handleToggle} name="Open" />
-          }
-          label="Show Open Only"
-        />
-      </FormGroup>
-    </FormControl>
+       <FormControl component="fieldset" variant="standard">
+  <FormGroup>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <FormControlLabel
+        control={
+          <Switch checked={switchState} onChange={handleToggle} name="Open" />
+        }
+        label="Show Open Only"
+      />
+      <div onClick={()=>{
+        handleNavigate();}}
+        
+
+       style={{ marginLeft: 'auto' }}>
+        <TrendingUpIcon/>
+      </div>
+    </div>
+  </FormGroup>
+</FormControl>
+
 
  {/* Delete Confirmation Modal */}
  <Dialog open={showDeleteConfirmation} onClose={handleCloseDeleteConfirmation}>

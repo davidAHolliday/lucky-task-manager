@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import HomeIcon from '@mui/icons-material/Home';
 
 const containerStyle = {
     display: 'flex',
@@ -60,18 +61,6 @@ const containerStyle = {
     },
   };
   
-  const landscapeStyles = {
-    // Landscape mode styles
-    transform: 'rotate(-90deg)',
-    transformOrigin: 'left top',
-    width: '100vh',
-    height: '100vw',
-    overflowX: 'hidden',
-    position: 'absolute',
-    top: '100%',
-    marginTop: '-100vw',
-    left: 0,
-  };
 
 
 function GuestProjections() {
@@ -88,6 +77,10 @@ function GuestProjections() {
     sun: '',
   });
 
+
+  const handleNavigate =()=>{
+    window.location.href = '/task-manager'
+   }
 
 
 
@@ -156,6 +149,8 @@ function GuestProjections() {
 
   return (
     <div style={containerStyle}>
+        <HomeIcon onClick={()=>handleNavigate()}/>
+        
       <table style={tableStyle}>
         <thead>
           <tr>
