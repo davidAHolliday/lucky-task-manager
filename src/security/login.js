@@ -3,7 +3,7 @@ import "./security.css"
 
 const Login = ({onLogin}) => {
   const [input, setInput] = useState('');
-  const correctPin = '1234';
+  const correctPin = '2019';
 
 
 useEffect(()=>{
