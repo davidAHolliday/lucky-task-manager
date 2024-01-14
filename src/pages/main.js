@@ -20,7 +20,6 @@ import Switch from '@mui/material/Switch';
 import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { Delete, DeleteForever, ExpandMoreOutlined } from "@mui/icons-material";
 import CircularProgress from '@mui/material/CircularProgress';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
