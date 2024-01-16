@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useNavigate  } from 'react-rout
 import Dashboard from './pages/main';
 import Login from './security/login';
 import GuestProjections from './pages/components/guestProjections';
+import LoanManager from './pages/components/loanManager';
 
 const AppRouter = () => {
 
@@ -52,6 +53,8 @@ const AppRouter = () => {
       <Route path="/" element={<Login onLogin={handleLogin} />} />
       <Route path="/task-manager" element={<PrivateRoute element={<Dashboard/>} />} />
       <Route path="/guest-projections" element={<PrivateRoute element={<GuestProjections/>} />} />
+      <Route path="/loan-management" element={<PrivateRoute element={<LoanManager/>} />} />
+
 
 
       </Routes>
