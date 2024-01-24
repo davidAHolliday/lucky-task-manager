@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import "./security.css"
+import BackspaceIcon from '@mui/icons-material/Backspace';
 
 const Login = ({ onLogin }) => {
   const [input, setInput] = useState('');
@@ -11,6 +12,23 @@ const Login = ({ onLogin }) => {
       window.location.href = '/task-manager';
     }
   }, [])
+
+
+  useEffect(()=>{
+
+    console.log(input)
+  },[input])
+
+
+  const handleBackspaceClick = () => {
+    console.log("BACKSPAC")
+    setInput((prevInput) => prevInput.slice(0, -1));
+    const dotIndex = input.length - 1;
+    const dotElement = document.getElementById(`dot-${dotIndex}`);
+    if (dotElement) {
+      dotElement.classList.remove('active');
+    }
+  };
 
   const handleNumberClick = (index) => {
     const enteredNumber = index ; // Correctly adjust the entered number
@@ -63,27 +81,6 @@ const Login = ({ onLogin }) => {
         dotElement.classList.add('active');
       }
   
-    //  if (input.length ==4 ) {
-    //     console.log("code entered", input);
-    //     setTimeout(() => {
-    //       if (input !== correctPin) {
-    //         document.body.classList.add('wrong');
-    //         console.log("wrong");
-    //       } else {
-    //         document.body.classList.add('correct');
-    //         console.log("correct");
-    //         onLogin(input);
-    //       }
-    //     }, 500);
-  
-    //     setTimeout(() => {
-    //       document.body.classList.remove('wrong', 'correct');
-    //       setInput('');
-    //       document.querySelectorAll('.dot').forEach((dot) => {
-    //         dot.classList.remove('active', 'wrong', 'correct');
-    //       });
-    //     }, 1000);
-    //   }
   
       if (numberElement) {
         numberElement.classList.remove('grow');
@@ -175,12 +172,25 @@ const Login = ({ onLogin }) => {
             {9}
           </div>
           <div
+            id={`number-${10}`}
+            className="number-blank-space"
+          >
+            {/* {0} */}
+          </div>
+          <div
             key={0}
             id={`number-${0}`}
             className="number"
             onClick={() => handleNumberButtonClick(0)}
           >
             {0}
+          </div>
+          <div
+          
+            className="number"
+            onClick={()=>handleBackspaceClick()}
+          >
+          <BackspaceIcon />
           </div>
   
       </div>
