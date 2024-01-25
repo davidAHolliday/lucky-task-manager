@@ -1,13 +1,25 @@
-import { Card, Grid, Typography } from '@mui/material';
+import { Box, Button, Card, FormControl, Grid,  MenuItem,  Select, TextField, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { formatDate } from '../../utils/helperFunctions';
-import { SecurityUpdate } from '@mui/icons-material';
 
 export const LoanManager = () => {
     const [data, setData] = useState([]);
     const [toast,setToast] = useState({display:false, message:""})
     const [update,setUpdate] = useState(false)
+    const [selectedValue, setSelectValue] = useState('')
+    const [formData, setFormData] = useState({
+        firstName:'',
+        lastName: '',
+        email: '',
+        phone: '',
+      });
+      const [formDataLoan, setFormDataLoan] = useState({
+        clientId:'',
+        originalAmount: '',
+        interestRate: '',
+        term: '',
+      });
 
     const fetchActiveLoans = () => {
         const url = "http://localhost:8080/banking/v1/loans";
@@ -18,6 +30,61 @@ export const LoanManager = () => {
                 return [];
             });
     }
+
+    const handleLoanInputChange =(event)=>{
+        const {id, value} = event.target
+        setFormDataLoan((prev)=>({
+            ...prev,
+            [id]:value,
+        }))
+    }
+
+    const handleInputChange = (e) =>{
+        const {id, value } = e.target;
+        setFormData((prevData)=> ({
+            ...prevData,
+            [id]:value,
+        }))
+    };
+    
+
+    const handleNewLoanSubmit=()=>{
+        const payload = {
+            clientId: selectedValue,
+            originalAmount: formDataLoan.originalAmount,
+            term: formDataLoan.term,
+            interestRate: formDataLoan.interestRate
+        }
+
+        const formattedString = `ClientID: ${payload.clientId}, Amount: ${payload.originalAmount}, Term: ${payload.term}, Interest Rate: ${payload.interestRate}`;
+
+        // Log or use the formatted string as needed
+        window.alert(`Payload: ${formattedString}}`)
+    }
+
+    const handleSubmit=()=>{
+        const formattedString = `First Name: ${formData.firstName}, Last Name: ${formData.lastName}, Email: ${formData.email}, Phone: ${formData.phone}`;
+
+        // Log or use the formatted string as needed
+        window.alert(`Payload: ${formattedString}}`)
+    }
+
+
+
+    const handleSelectChange =(event)=>{
+        
+        setSelectValue(event.target.value)
+    }
+
+    const clients = [
+        {name:'Oliver Hansen',   value:"1"},     
+        {name:'Van Henry', value:"2"},
+        {name:'mike', value:"3"},
+        {name:'Joh Henry', value:"4"},
+        {name:'Ull Henry', value:"5"},
+
+     
+      ];
 
 
     const handleQuickPayment = (id,paymentAmount) => {
@@ -141,10 +208,67 @@ export const LoanManager = () => {
     <h1>{toast.message}</h1>
   </div>
 )}
-  <Card style={{ padding: 10, marginTop:"10px"}}>
-       
-    
-                </Card>
+
+{/* ADD CLIENT */}
+  <Card style={{ padding: 20}}>
+    <Typography variant='h4' padding={1}>Add Client</Typography>
+  <Box sx={{ flexGrow: 1 }}>
+    <FormControl>
+        <Grid container spacing={1}>
+            <Grid xs={5} marginBottom={5} marginRight={1} >
+            <TextField fullWidth id='firstName' label="First Name" varient="outlined" onChange={handleInputChange}/>
+            </Grid> 
+            <Grid xs={5} >
+                <TextField fullWidth id='lastName' label="Last Name" varient="outlined" onChange={handleInputChange}/>
+            </Grid>
+            <Grid xs={5} marginBottom={5} marginRight={1} >
+                <TextField type="email" fullWidth id='email' label="Email" varient="outlined" onChange={handleInputChange}/>
+            </Grid>
+            <Grid xs={5} >
+                <TextField type="tel" fullWidth id='phone' label="Phone" varient="outlined" onChange={handleInputChange}/>
+            </Grid>
+        </Grid>
+
+        <Button onClick={handleSubmit}>Submit</Button>
+    </FormControl>
+    </Box>
+    </Card>
+
+{/* ADD LOAN */}
+    <Card style={{ padding: 20}}>
+    <Typography variant='h4' padding={1}>Add Loan</Typography>
+  <Box sx={{ flexGrow: 1 }}>
+    <FormControl>
+        <Grid container spacing={1}>
+            <Grid xs={6} marginBottom={5} marginRight={1} >
+            <Select
+    value={selectedValue.value}
+    onChange={(e) => handleSelectChange(e)}
+    variant="outlined"
+    style={{ width: '100%' }}
+>
+    {clients.map((user, index) => (
+        <MenuItem name={user.name} value={user.value}>
+            {user.name}
+        </MenuItem>
+    ))}
+</Select>
+
+            </Grid>
+            <Grid xs={5} >
+                <TextField fullWidth id='originalAmount' label="Loan Amount" varient="outlined" onChange={handleLoanInputChange}/>
+            </Grid>
+            <Grid xs={5} marginBottom={5} marginRight={1} >
+                <TextField fullWidth id='interestRate' label="Interest Rate" varient="outlined" onChange={handleLoanInputChange}/>
+            </Grid>
+            <Grid xs={5} >
+                <TextField fullWidth id='term' label="Term" varient="outlined" onChange={handleLoanInputChange}/>
+            </Grid>
+        </Grid>
+        <Button type="submit" onClick={handleNewLoanSubmit}>Submit</Button>
+    </FormControl>
+    </Box>
+    </Card>
 {data.sort((a,b)=> a.summary.balance - b.summary.balance)
   .map((record, index) => (                <Card style={{ padding: 10, marginTop:"10px" ,backgroundColor:index %2 ==0? "#ADD8E6":""
          }} key={record.loanId}>
