@@ -64,9 +64,7 @@ export const LoanManager = () => {
   const addToCollectedAmount = (amount) =>{
     const url = `${baseUrl}/banking/v1/admin/collections/${amount}`;
     axios.put(url,[])
-    .then(response =>{
-        setUpdate(prev=>!prev)
-        })
+    .then(response =>response.data)
 
         .catch(error=>{
         console.log("ERROR: ", error)
