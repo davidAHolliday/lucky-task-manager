@@ -45,11 +45,57 @@ export const LoanManager = () => {
 
     }
 
+    const fetchCollectionAmount = () =>{
+      const url = `${baseUrl}/banking/v1/admin`;
+      axios.get(url)
+      .then(response =>{
+            setCollectedToday(response.data.dailyCollection)
+          
+          
+          })
+
+          .catch(error=>{
+          console.log("ERROR: ", error)
+      })
+
+
+  }
+
+  const addToCollectedAmount = (amount) =>{
+    const url = `${baseUrl}/banking/v1/admin/collections/${amount}`;
+    axios.put(url,[])
+    .then(response =>{
+        setUpdate(prev=>!prev)
+        })
+
+        .catch(error=>{
+        console.log("ERROR: ", error)
+    })
+
+
+}
+
+const resetCollectedAmount = () =>{
+  const url = `${baseUrl}/banking/v1/admin/collections/reset`;
+  axios.put(url,[])
+  .then(response =>{
+      setUpdate(prev=>!prev)
+      })
+
+      .catch(error=>{
+      console.log("ERROR: ", error)
+  })
+
+
+}
+
     const fetchActiveLoans = () => {
         const url = `${baseUrl}/banking/v1/loans`;
         return axios.get(url)
             .then(response => response.data)
+            
             .catch(error => {
+
                 console.error(error);
                 return [];
             });
@@ -129,6 +175,7 @@ export const LoanManager = () => {
 
 
     const handleQuickPayment = (id,paymentAmount) => {
+      addToCollectedAmount(paymentAmount)
         const url = `${baseUrl}/banking/v1/transactions`;
         return axios.post(url,{
             loanId: id,
@@ -143,10 +190,6 @@ export const LoanManager = () => {
                 setTimeout(()=>{
                     setToast({display:false,message: ""})
                     setUpdate(prev=>!prev)
-                    setCollectedToday(prevData=> prevData+paymentAmount)
-
-                
-
                 },3000)
 
             })
@@ -158,7 +201,7 @@ export const LoanManager = () => {
 
     const handleQuickInterest = (id,paymentAmount) => {
         const url = `${baseUrl}/banking/v1/transactions`;
-        setCollectedToday(prevData=> prevData+paymentAmount)
+        addToCollectedAmount(paymentAmount)
 
         return axios.post(url,{
             loanId: id,
@@ -173,8 +216,6 @@ export const LoanManager = () => {
                 setTimeout(()=>{
                     setToast({display:false,message: ""})
                     setUpdate(prev=>!prev)
-                    setCollectedToday(prevData=> prevData+paymentAmount)
-
                 },3000)
             })
             .catch(error => {
@@ -214,12 +255,18 @@ export const LoanManager = () => {
             }
         }
 
+
+fetchCollectionAmount();
         fetchData();
         fetchClients();
     }, [update]);
 
-    console.log(data);
-
+console.log(data)
+    const sortedData = [...data].sort((a, b) => {
+      const firstNameA = a.summary.client.firstName.toLowerCase();
+      const firstNameB = b.summary.client.firstName.toLowerCase();
+      return firstNameA.localeCompare(firstNameB);
+    });
 
       return (
         <div style={{ backgroundColor: '#e3f2fd', height: '100vh', padding: '20px' }}>
@@ -230,7 +277,7 @@ export const LoanManager = () => {
           )}
     
 
-{data.map((record,index)=>{
+{sortedData.map((record,index)=>{
   const lastTransaction = record.summary.loan.transactions.slice(-1)[0];
 
   const isToday = lastTransaction && lastTransaction.createDate &&
@@ -317,7 +364,8 @@ export const LoanManager = () => {
 
           <div className='summary'>
             <Card style={{marginTop:"10px"}}>
-            <Typography variant='h2'>Collected Today $ {collectedToday}</Typography>
+            <Typography variant='h2'>Collected Today $ {collectedToday.toFixed(2)}</Typography>
+            <Button onClick={()=>resetCollectedAmount()}>Clear</Button>
             </Card>
 
           </div>
