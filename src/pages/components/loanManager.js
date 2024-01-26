@@ -101,10 +101,16 @@ export const LoanManager = () => {
         })
 
 
-        const formattedString = `First Name: ${formData.firstName}, Last Name: ${formData.lastName}, Email: ${formData.email}, Phone: ${formData.phone}`;
+        const formattedString = `First Name: ${formData.firstName}, Last Name: ${formData.lastName}, Email: ${formData.email}, Phone: ${formData.phoneNumber}`;
 
         // Log or use the formatted string as needed
         window.alert(`Payload: ${formattedString}}`)
+        setFormData({
+          firstName:"",
+          lastName:"",
+          phoneNumber:"",
+          email:""
+        })
     }
 
     const toggleForm = () => {
@@ -214,33 +220,6 @@ export const LoanManager = () => {
 
     console.log(data);
 
-    const styles = {
-        card: {
-          margin: '10px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-          backgroundColor: '#f0f8ff', // Light blue background
-          color: '#808080', // Silver text color
-          width:"700px",
-        },
-        header:{
-            backgroundColor:"blue",
-            color:"white",
-            height:"25px",
-            padding:'20px',
-            marginTop:'0',
-            
-        },
-        contentContainer:{
-            display:"flex",
-            flexDirection:"row"
-
-        },
-        infoLeft:{
-            backgroundColor:"orange"
-
-        }
-      };
 
       return (
         <div style={{ backgroundColor: '#e3f2fd', height: '100vh', padding: '20px' }}>
@@ -250,12 +229,23 @@ export const LoanManager = () => {
             </div>
           )}
     
-          {data.map((record, index) => (
-            <Card
+
+{data.map((record,index)=>{
+  const lastTransaction = record.summary.loan.transactions.slice(-1)[0];
+
+  const isToday = lastTransaction && lastTransaction.createDate &&
+  new Date(lastTransaction.createDate).toDateString() === new Date().toDateString();
+  
+  const backgroundColor = isToday ? "green" : index % 2 === 0 ? '#bbdefb' : '';
+  
+
+  return(
+    <>
+                <Card
               style={{
                 padding: '15px',
                 marginTop: '10px',
-                backgroundColor: index % 2 === 0 ? '#bbdefb' : '',
+                backgroundColor: backgroundColor,
               }}
               key={record.loanId}
             >
@@ -317,7 +307,13 @@ export const LoanManager = () => {
                 </div>
               </div>
             </Card>
-          ))}
+
+    </>
+  )
+
+})}
+
+      
 
           <div className='summary'>
             <Card style={{marginTop:"10px"}}>
@@ -381,7 +377,7 @@ export const LoanManager = () => {
                       </Button>
     
                       <Button onClick={toggleForm} style={{ color:"white",backgroundColor: '#4caf50' }}>
-                        {isAddClient ? 'Switch to Add Loan' : 'Switch to Add Client'}
+                        Switch to Add Client
                       </Button>
                       </div>
 
@@ -404,7 +400,7 @@ export const LoanManager = () => {
                       Submit
                     </Button>
                     <Button onClick={toggleForm} style={{ color:"white", backgroundColor: '#2196f3'}}>
-                      {isAddClient ? 'Switch to Add Loan' : 'Switch to Add Client'}
+                      Switch to Add Loan
                     </Button>
                     </div>
                   </FormControl>
