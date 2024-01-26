@@ -36,7 +36,6 @@ export const LoanManager = () => {
              mapToValues.push({name:`${firstName} ${lastName}`, value:`${id}`})
             })
             setClientList(mapToValues)
-            console.log(mapToValues)
 
             }).catch(error=>{
             console.log("ERROR: ", error)
@@ -183,7 +182,6 @@ const resetCollectedAmount = () =>{
 
         })
             .then(response => {
-                console.log(response.data)
                 setToast({display:true,message: "Successfully Made a Payment"})
                 setTimeout(()=>{
                     setToast({display:false,message: ""})
@@ -209,7 +207,6 @@ const resetCollectedAmount = () =>{
 
         })
             .then(response =>{ 
-                console.log(response.data)
                 setToast({display:true,message: "Successfully Made a Interest Only"})
                 setTimeout(()=>{
                     setToast({display:false,message: ""})
@@ -259,7 +256,6 @@ fetchCollectionAmount();
         fetchClients();
     }, [update]);
 
-console.log(data)
     const sortedData = [...data].sort((a, b) => {
       const firstNameA = a.summary.client.firstName.toLowerCase();
       const firstNameB = b.summary.client.firstName.toLowerCase();
