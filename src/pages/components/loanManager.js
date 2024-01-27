@@ -12,7 +12,7 @@ export const LoanManager = () => {
     const [clientList, setClientList] = useState([])
     const [selectedValue, setSelectValue] = useState('')
     const [collectedToday,setCollectedToday] = useState(0)
-    const [flipTrigger,setFlipTrigger] = useState(true);
+    const [flipTrigger,setFlipTrigger] = useState({0:false,1:false,2:false});
     const [formData, setFormData] = useState({
         firstName:'',
         lastName: '',
@@ -355,32 +355,44 @@ fetchCollectionAmount();
 
 })}
 
-      <FlipCardComponent setFlipTrigger={setFlipTrigger} flipTrigger={flipTrigger} side={flipTrigger?"front":"back"}>
-{ flipTrigger ?    
-<FrontCard>
-<Card style={{marginTop:"10px"}}>
-        <Typography variant='h2'>Collected Today $ {collectedToday.toFixed(2)}</Typography>
-        <Button onClick={()=>resetCollectedAmount()}>Clear</Button>
-        </Card>
-</FrontCard>
-:
-<BackCard>
 
-<Card style={{marginTop:"10px"}}>
-       <Typography variant='h2'>Collected Yesteraday $ {collectedToday.toFixed(2)}</Typography>
-       <Button onClick={()=>resetCollectedAmount()}>Clear</Button>
-       </Card>
-</BackCard>     
-      
-      }
-      </FlipCardComponent>
 
+    {sortedData.map((record,index)=>{
+      return(
+        <FlipCardComponent index={index} setFlipTrigger={setFlipTrigger} flipTrigger={flipTrigger[index]} side={flipTrigger[index]?"front":"back"}>
+        { flipTrigger[index] ?    
+              <FrontCard>
+                <div>
+                Collected {record.summary.balance} $ {collectedToday.toFixed(2)}
+              <Button onClick={()=>resetCollectedAmount()}>Clear</Button>
+                </div>
+        </FrontCard>
+        :
+        <BackCard>
+        <div>
+                Collected Yesterday $ {collectedToday.toFixed(2)}
+              <Button onClick={()=>resetCollectedAmount()}>Clear</Button>
+                </div>
+        </BackCard>     
+              
+              }
+              </FlipCardComponent>
+
+
+      )
+            
+
+
+    })}
+
+
+     
 
 
 
 
     
-          <div className="card" style={{ marginTop: '20px', transition: 'transform 0.5s', transformStyle: 'preserve-3d' }}>
+          {/* <div className="card" style={{ marginTop: '20px', transition: 'transform 0.5s', transformStyle: 'preserve-3d' }}>
             <div
               className="content"
               style={{
@@ -465,7 +477,7 @@ fetchCollectionAmount();
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       );
 }

@@ -1,10 +1,10 @@
 import { Card } from '@mui/material';
 import React from 'react';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 
-export const FlipCardComponent = ({ children, flipTrigger, side,setFlipTrigger }) => {
+export const FlipCardComponent = ({ children, flipTrigger, side, setFlipTrigger, index }) => {
   return (
-    <div className="card" style={{ marginTop: '20px', transition: 'transform 0.5s', transformStyle: 'preserve-3d' }}>
-        <button onClick={()=>setFlipTrigger(prev=>!prev)}>Flip</button>
+    <div className="card" style={{ marginTop: '60px', transition: 'transform 0.5s', transformStyle: 'preserve-3d' }}>
       <div
         className="content"
         style={{
@@ -26,24 +26,21 @@ export const FlipCardComponent = ({ children, flipTrigger, side,setFlipTrigger }
           </div>
         </div>
       </div>
+      <div style={{width:"100%",backgroundColor:"grey"}}className="flip-button-container">
+        <span style={{marginLeft:"10px"}}><AutorenewIcon onClick={() => setFlipTrigger((prev) => ({ ...prev, [index]: !prev[index] }))}/></span>
+      </div>
     </div>
   );
 };
 
-
 export const FrontCard = ({ children }) => (
-    <div className='summary'>
-      <Card style={{ marginTop: "10px" }}>
-        {children}
-      </Card>
-    </div>
-  );
+  <div className="">
+    <div>{children}</div>
+  </div>
+);
 
-  export const BackCard = ({ children }) => (
-    <div className='summary'>
-      <Card style={{ marginTop: "10px" }}>
-       {children}
-      </Card>
-    </div>
-  );
-  
+export const BackCard = ({ children }) => (
+  <div className="">
+    <div>{children}</div>
+  </div>
+);

@@ -217,10 +217,11 @@ body {
 
 .card {
   position: relative;
-  width: 80vw;
-  height: 45vh;
-  margin: 50px auto;
-  perspective: 1000px; /* Adjusted perspective value */
+  width: 100vw;
+  height: 300px;
+  perspective: 1000px;
+  margin-bottom: 50px;
+   
 }
 
 .content {
@@ -251,8 +252,8 @@ body {
 }
 
 .back {
-  background: white;
-  color: #03446A;
+  background: #03446A;
+  color: white;
   transform: rotateY(180deg);
 }
 
