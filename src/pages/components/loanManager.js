@@ -2,6 +2,7 @@ import { Box, Button, Card, FormControl, Grid,  MenuItem,  Select, TextField, Ty
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { baseUrl, formatDate } from '../../utils/helperFunctions';
+import  { BackCard, FlipCardComponent, FrontCard } from './flipCard';
 
 export const LoanManager = () => {
     const [data, setData] = useState([]);
@@ -11,6 +12,7 @@ export const LoanManager = () => {
     const [clientList, setClientList] = useState([])
     const [selectedValue, setSelectValue] = useState('')
     const [collectedToday,setCollectedToday] = useState(0)
+    const [flipTrigger,setFlipTrigger] = useState(true);
     const [formData, setFormData] = useState({
         firstName:'',
         lastName: '',
@@ -278,7 +280,6 @@ fetchCollectionAmount();
   new Date(lastTransaction.createDate).toDateString() === new Date().toDateString();
   
   const backgroundColor = isToday ? "green" : index % 2 === 0 ? '#bbdefb' : '';
-  
 
   return(
     <>
@@ -354,15 +355,30 @@ fetchCollectionAmount();
 
 })}
 
+      <FlipCardComponent setFlipTrigger={setFlipTrigger} flipTrigger={flipTrigger} side={flipTrigger?"front":"back"}>
+{ flipTrigger ?    
+<FrontCard>
+<Card style={{marginTop:"10px"}}>
+        <Typography variant='h2'>Collected Today $ {collectedToday.toFixed(2)}</Typography>
+        <Button onClick={()=>resetCollectedAmount()}>Clear</Button>
+        </Card>
+</FrontCard>
+:
+<BackCard>
+
+<Card style={{marginTop:"10px"}}>
+       <Typography variant='h2'>Collected Yesteraday $ {collectedToday.toFixed(2)}</Typography>
+       <Button onClick={()=>resetCollectedAmount()}>Clear</Button>
+       </Card>
+</BackCard>     
       
+      }
+      </FlipCardComponent>
 
-          <div className='summary'>
-            <Card style={{marginTop:"10px"}}>
-            <Typography variant='h2'>Collected Today $ {collectedToday.toFixed(2)}</Typography>
-            <Button onClick={()=>resetCollectedAmount()}>Clear</Button>
-            </Card>
 
-          </div>
+
+
+
     
           <div className="card" style={{ marginTop: '20px', transition: 'transform 0.5s', transformStyle: 'preserve-3d' }}>
             <div
