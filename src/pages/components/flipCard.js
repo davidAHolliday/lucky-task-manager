@@ -4,43 +4,32 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 
 export const FlipCardComponent = ({ children, flipTrigger, side, setFlipTrigger, index }) => {
   return (
-    <div className="card" style={{ marginTop: '60px', transition: 'transform 0.5s', transformStyle: 'preserve-3d' }}>
+    <div className="card-container" style={{ perspective: '1000px' }}>
       <div
-        className="content"
+        className="card"
         style={{
-          transition: flipTrigger ? '0.5s' : '',
-          transform: flipTrigger ? 'rotateY(0deg)' : 'rotateY(180deg)',
+          transform: flipTrigger ? 'rotateY(180deg)' : 'rotateY(0deg)',
+          transition:  '0.5s',
+          transformStyle: 'preserve-3d' ,
         }}
       >
-        <div className={side} style={{ backfaceVisibility: 'hidden' }}>
-          <div
-            className={`card-container ${flipTrigger ? 'front' : 'back'}`}
-            style={{
-              transformStyle: 'preserve-3d',
-              transition: 'transform 0.5s',
-            }}
-          >
-            <div className="card" style={{ transform: flipTrigger ? 'rotateY(0deg)' : 'rotateY(180deg)', backfaceVisibility: 'hidden' }}>
-              {children}
-            </div>
-          </div>
-        </div>
+        {children}
       </div>
-      <div style={{width:"100%",backgroundColor:"grey"}}className="flip-button-container">
-        <span style={{marginLeft:"10px"}}><AutorenewIcon onClick={() => setFlipTrigger((prev) => ({ ...prev, [index]: !prev[index] }))}/></span>
+      <div style={{ width: '100%', backgroundColor: 'grey', pointerEvents: 'auto' }} className="flip-button-container">
+        <span style={{ marginLeft: '10px' }}><AutorenewIcon onClick={() => setFlipTrigger((prev) => ({ ...prev, [index]: !prev[index] }))}/></span>
       </div>
     </div>
   );
 };
 
 export const FrontCard = ({ children }) => (
-  <div className="">
+  <div style={{ marginBottom: '20px' }} className="front-card">
     <div>{children}</div>
   </div>
 );
 
 export const BackCard = ({ children }) => (
-  <div className="">
-    <div>{children}</div>
+  <div className="back-card">
+    <div style={{ transform: 'rotateY(180deg)' }}>{children}</div>
   </div>
 );

@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { baseUrl, formatDate } from '../../utils/helperFunctions';
 import  { BackCard, FlipCardComponent, FrontCard } from './flipCard';
+import { flexbox } from '@mui/system';
 
 export const LoanManager = () => {
     const [data, setData] = useState([]);
@@ -12,7 +13,10 @@ export const LoanManager = () => {
     const [clientList, setClientList] = useState([])
     const [selectedValue, setSelectValue] = useState('')
     const [collectedToday,setCollectedToday] = useState(0)
-    const [flipTrigger,setFlipTrigger] = useState({0:false,1:false,2:false});
+    const [flipTrigger,setFlipTrigger] = useState({});
+    const [flipTriggerSolo,setFlipTriggerSolo] = useState({});
+
+    const [flipTriggerCollection,setFlipTriggerCollection] = useState({})
     const [formData, setFormData] = useState({
         firstName:'',
         lastName: '',
@@ -273,7 +277,7 @@ fetchCollectionAmount();
           )}
     
 
-{sortedData.map((record,index)=>{
+{/* {sortedData.map((record,index)=>{
   const lastTransaction = record.summary.loan.transactions.slice(-1)[0];
 
   const isToday = lastTransaction && lastTransaction.createDate &&
@@ -353,46 +357,130 @@ fetchCollectionAmount();
     </>
   )
 
-})}
+})} */}
 
 
 
     {sortedData.map((record,index)=>{
+        const lastTransaction = record.summary.loan.transactions.slice(-1)[0];
+
+        const isToday = lastTransaction && lastTransaction.createDate &&
+        new Date(lastTransaction.createDate).toDateString() === new Date().toDateString();
+        
+        const backgroundColor = isToday ? "green" : index % 2 === 0 ? '#bbdefb' : '';
+      
       return(
         <FlipCardComponent index={index} setFlipTrigger={setFlipTrigger} flipTrigger={flipTrigger[index]} side={flipTrigger[index]?"front":"back"}>
-        { flipTrigger[index] ?    
-              <FrontCard>
-                <div>
-                Collected {record.summary.balance} $ {collectedToday.toFixed(2)}
-              <Button onClick={()=>resetCollectedAmount()}>Clear</Button>
+
+        { !flipTrigger[index] ?    
+              <FrontCard >
+                <div style={{display:"flex", flexDirection:"row", backgroundColor:backgroundColor,height:"301px"}} className='card-container-loan'>
+                  <div style={{width:"20%",backgroundColor:"",textAlign:"center"}} className='left-stub'>
+                          <div style={{display:"flex", flexDirection:"column",fontSize:"30px",height:"33%",backgroundColor:"white", color:"#333",alignItems: 'center', justifyContent: 'center'}}>Balance: <span>{record.summary.balance}</span></div>
+                        <div style={{display:"flex", flexDirection:"column",fontSize:"30px",height:"33%",backgroundColor:"white" , color:"#333",alignItems: 'center', justifyContent: 'center'}}>Other</div>
+                        <div  style={{display:"flex", flexDirection:"column",fontSize:"30px",height:"33%",backgroundColor:"white" , color:"#333",alignItems: 'center', justifyContent: 'center'}}>
+                          Payments Left: {record.summary.paymentsleft.toFixed(2)}
+                        </div>
+                  </div>
+                  <div style={{display:"flex", flexDirection:"column",width:"70%",backgroundColor:"",alignItems: 'center', justifyContent: 'center'}} className='ticket'>
+                  <div style={{ fontSize: '', color: 'green' }}>${record.summary.paymentAmount}</div>
+                  <div>{record.summary.client.firstName} {record.summary.client.lastName}</div>
+                  <div style={{fontFamily:"monospace",fontSize:"15px"}}> _Id: {record.summary.loan.loanId}</div>
+                  <div style={{ fontSize: '20px', color: '#2196f3' }}>
+                    Last update:{' '}
+                    {record.summary.loan.transactions.length > 0 && (
+                      <>
+                        {formatDate(record.summary.loan.transactions.slice(-1)[0].createDate)} $
+                        {record.summary.loan.transactions.slice(-1)[0].amount}{' '}
+                        {record.summary.loan.transactions.slice(-1)[0].note}
+                      </>
+                    )}
+                  </div>
+
+                  </div>
+                  <div style={{ width: "10%" }} className='right'>
+    <button 
+
+    onClick={() => 
+      handleQuickPayment(record.summary.loan.loanId, record.summary.paymentAmount)
+    }
+    style={{ pointerEvents: 'auto',width: '100%', height: '40px', backgroundColor: '#4caf50', marginBottom: '5px' }}
+  >
+    Quick Payment
+  </button>
+  <button 
+    onClick={() =>
+       handleQuickInterest(record.summary.loan.loanId, record.summary.loan.interestRate * 100)
+      }
+    style={{pointerEvents: 'auto', width: '100%', height: '40px', backgroundColor: '#2196f3', marginTop: 'auto' }}
+  >
+    Interest Only
+  </button>
+</div>
+
+
                 </div>
+
+
+        
         </FrontCard>
         :
         <BackCard>
-        <div>
-                Collected Yesterday $ {collectedToday.toFixed(2)}
-              <Button onClick={()=>resetCollectedAmount()}>Clear</Button>
-                </div>
+         <div style={{display:"flex", flexDirection:"row", backgroundColor:backgroundColor,height:"301px"}} className='card-container-loan'>
+                  <div style={{width:"20%",backgroundColor:"",textAlign:"center"}} className='left-stub'>   
+                  </div>
+                  <div style={{display:"flex", flexDirection:"column",width:"70%",backgroundColor:"",alignItems: 'center', justifyContent: 'center'}} className='ticket'>
+                  <h1>Back of Ticket</h1>
+                  </div>
+                  <div style={{ width: "10%" }} className='right'>
+                    </div>
+                    </div>
         </BackCard>     
               
-              }
+             } 
               </FlipCardComponent>
 
 
       )
-            
-
+          
 
     })}
 
+{[1].map((data, index) => (
+  <FlipCardComponent
+    key={index}  // Don't forget to add a unique key prop when mapping over elements
+    index={index}
+    setFlipTrigger={setFlipTriggerSolo}
+    flipTrigger={flipTriggerSolo[index]}
+    side={flipTriggerSolo[index] ? "front" : "back"}
+  >
+    {!flipTriggerSolo[index] ? (
+      <FrontCard>
+        <h1 onClick={()=>console.log("CLICK")}>
+          Collected Yesterday $ {collectedToday.toFixed(2)}
+          <Button onClick={() => resetCollectedAmount()}>Clear</Button>
+        </h1>
+      </FrontCard>
+    ) : (
+      <BackCard>
+        <div>{/* Add content for the back side of the card */}</div>
+      </BackCard>
+    )}
+  </FlipCardComponent>
+))}
 
-     
 
+
+
+
+ 
+
+        
 
 
 
     
-          {/* <div className="card" style={{ marginTop: '20px', transition: 'transform 0.5s', transformStyle: 'preserve-3d' }}>
+          <div className="card" style={{ marginTop: '20px', transition: 'transform 0.5s', transformStyle: 'preserve-3d' }}>
             <div
               className="content"
               style={{
@@ -477,7 +565,7 @@ fetchCollectionAmount();
                 </div>
               </div>
             </div>
-          </div> */}
+          </div>
         </div>
       );
 }

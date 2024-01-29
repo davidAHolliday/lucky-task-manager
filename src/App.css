@@ -220,7 +220,7 @@ body {
   width: 100vw;
   height: 300px;
   perspective: 1000px;
-  margin-bottom: 50px;
+  margin-bottom: 0px;
    
 }
 
@@ -240,15 +240,21 @@ body {
   height: 100%;
   width: 100%;
   background: white;
-  line-height: 300px;
+  /* line-height: 300px; */
   color: #03446A;
-  text-align: center;
-  font-size: 60px;
+  /* text-align: center; */
+  /* font-size: 60px; */
   border-radius: 5px;
   backface-visibility: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.ticket{
+    text-align: center;
+  font-size: 50px; 
+
 }
 
 .back {
