@@ -1,4 +1,4 @@
-import { Box, Button, Card, FormControl, Grid,  MenuItem,  Select, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, FormControl, Grid,  MenuItem,  Select, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { baseUrl, formatDate } from '../../utils/helperFunctions';
@@ -15,6 +15,8 @@ export const LoanManager = () => {
     const [collectedToday,setCollectedToday] = useState(0)
     const [flipTrigger,setFlipTrigger] = useState({});
     const [flipTriggerSolo,setFlipTriggerSolo] = useState({});
+    const [transactionData,setTransactionData] = useState([])
+    const [updateTrans,setUpdateTrans] = useState(false);
 
     const [flipTriggerCollection,setFlipTriggerCollection] = useState({})
     const [formData, setFormData] = useState({
@@ -49,6 +51,18 @@ export const LoanManager = () => {
 
 
     }
+
+    const fetchTransactions = () =>{
+      const url = `${baseUrl}/banking/v1/transactions`;
+      axios.get(url)
+      .then(response =>{
+          setTransactionData(response.data)
+
+          }).catch(error=>{
+          console.log("ERROR: ", error)
+      })
+
+  }
 
     const fetchCollectionAmount = () =>{
       const url = `${baseUrl}/banking/v1/admin`;
@@ -237,6 +251,27 @@ const resetCollectedAmount = () =>{
             return response
     }
 
+    const deleteTransactions = (id) => {
+      const url = `${baseUrl}/banking/v1/transactions/${id}`;
+
+      // const url = `${baseUrl}/banking/v1/transaction/${id}`;
+      const response = axios.delete(url)
+          .then(response =>{
+            setUpdateTrans(prev=>!prev)
+            setToast(true,"Transaction Delete")
+            setTimeout(()=>{
+              setToast(false,"")
+            },2000)
+
+          }
+           )
+          .catch(error => {
+              console.error(error);
+              return null;
+          });
+          return response
+  }
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -260,7 +295,15 @@ const resetCollectedAmount = () =>{
 fetchCollectionAmount();
         fetchData();
         fetchClients();
+        fetchTransactions();
     }, [update]);
+
+
+    useEffect(()=>{
+      fetchTransactions();
+
+    },[updateTrans])
+    
 
     const sortedData = [...data].sort((a, b) => {
       const firstNameA = a.summary.client.firstName.toLowerCase();
@@ -276,91 +319,6 @@ fetchCollectionAmount();
             </div>
           )}
     
-
-{/* {sortedData.map((record,index)=>{
-  const lastTransaction = record.summary.loan.transactions.slice(-1)[0];
-
-  const isToday = lastTransaction && lastTransaction.createDate &&
-  new Date(lastTransaction.createDate).toDateString() === new Date().toDateString();
-  
-  const backgroundColor = isToday ? "green" : index % 2 === 0 ? '#bbdefb' : '';
-
-  return(
-    <>
-                <Card
-              style={{
-                padding: '15px',
-                marginTop: '10px',
-                backgroundColor: backgroundColor,
-              }}
-              key={record.loanId}
-            >
-              <div style={{ width: '100%', display: 'flex', flexDirection: 'row' }} className="record">
-                <div style={{ display: 'flex', flexDirection: 'column' }} className="record-head">
-                  <Grid container spacing={2}>
-                    <Grid item xs={8}>
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography variant="button" style={{ marginBottom: '8px', color: '#2196f3' }}>
-                          Balance
-                        </Typography>
-                        <Typography variant="h5">${record.summary.balance}</Typography>
-                        <Typography variant="button" style={{ marginTop: '16px', color: '#2196f3' }}>
-                          Payments Left: {record.summary.paymentsleft}
-                        </Typography>
-                      </div>
-                    </Grid>
-                    <Grid item xs={4}>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <div style={{ marginRight: '16px' }}>
-                          <i className="ni ni-money-coins" style={{ color: '#2196f3' }}></i>
-                        </div>
-                      </div>
-                    </Grid>
-                  </Grid>
-                </div>
-    
-                <div style={{ width: '90%' }}>
-                  <h1 style={{ textAlign: 'center', color: '#4caf50' }}>${record.summary.paymentAmount}</h1>
-                  <h1 style={{ textAlign: 'center' }}>
-                    {record.summary.client.firstName} {record.summary.client.lastName}
-                  </h1>
-                  <p style={{ textAlign: 'center' }}>{record.summary.loan.loanId}</p>
-                  <p style={{ textAlign: 'center', color: '#2196f3' }}>
-                    Last update:{' '}
-                    {record.summary.loan.transactions.length > 0 && (
-                      <>
-                        {formatDate(record.summary.loan.transactions.slice(-1)[0].createDate)} $
-                        {record.summary.loan.transactions.slice(-1)[0].amount}{' '}
-                        {record.summary.loan.transactions.slice(-1)[0].note}
-                      </>
-                    )}
-                  </p>
-                </div>
-    
-                <div style={{ display: 'grid', width: '10%', alignContent: 'space-between' }}>
-                  <button
-                    onClick={() => handleQuickPayment(record.summary.loan.loanId, record.summary.paymentAmount)}
-                    style={{ justifySelf: 'start', height: '40px', backgroundColor: '#4caf50' }}
-                  >
-                    Quick Payment
-                  </button>
-                  <button
-                    onClick={() => handleQuickInterest(record.summary.loan.loanId, record.summary.loan.interestRate * 100)}
-                    style={{ justifySelf: 'end', height: '40px', backgroundColor: '#2196f3' }}
-                  >
-                    Interest Only
-                  </button>
-                </div>
-              </div>
-            </Card>
-
-    </>
-  )
-
-})} */}
-
-
-
     {sortedData.map((record,index)=>{
         const lastTransaction = record.summary.loan.transactions.slice(-1)[0];
 
@@ -426,14 +384,37 @@ fetchCollectionAmount();
         </FrontCard>
         :
         <BackCard>
-         <div style={{display:"flex", flexDirection:"row", backgroundColor:backgroundColor,height:"301px"}} className='card-container-loan'>
-                  <div style={{width:"20%",backgroundColor:"",textAlign:"center"}} className='left-stub'>   
-                  </div>
-                  <div style={{display:"flex", flexDirection:"column",width:"70%",backgroundColor:"",alignItems: 'center', justifyContent: 'center'}} className='ticket'>
-                  <h1>Back of Ticket</h1>
-                  </div>
-                  <div style={{ width: "10%" }} className='right'>
-                    </div>
+  <div className='table-container'>
+             <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Amount</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Notes</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody className='table-body'>
+                {transactionData.filter((x)=> x.loanId === record.summary.loan.loanId).map((transaction,index)=>{
+                  console.log("mapping trans", transaction,record.summary.loan.loanId)
+                  return(
+                  <TableRow>
+                    <TableCell>{formatDate(transaction.createDate)}</TableCell>
+                    <TableCell>{transaction.amount.toFixed(2)}</TableCell>
+                    <TableCell>{transaction.type}</TableCell>
+                    <TableCell>{transaction.note}</TableCell>
+                    <TableCell><button onClick={()=>deleteTransactions(transaction.transactionId)}>Delete</button></TableCell>
+
+
+                  </TableRow>
+                  )
+
+
+                })}
+              
+              </TableBody>
+             </Table>
                     </div>
         </BackCard>     
               
