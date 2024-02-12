@@ -123,16 +123,22 @@ const handleAddNotes = () =>{
 
 const handleNewChecklistSubmit = ()=>{
     const payload = checklistData;
-    
-    const url = `${baseUrl}/task/v1/checklist/${taskProfile.taskId}`;
-    axios.put(url, payload)
-        .then(response => {
-            setTaskProfile(response.data)
-    //Now lets reset the input field
-    setChecklistData({itemText:"",index:null,doneStatus:false})
 
+    if(checklistData.itemText){
+        const url = `${baseUrl}/task/v1/checklist/${taskProfile.taskId}`;
+        axios.put(url, payload)
+            .then(response => {
+                setTaskProfile(response.data)
+        //Now lets reset the input field
+        setChecklistData({itemText:"",index:null,doneStatus:false})
+    })
+
+
+    }
     
-})
+  
+    
+
 }
 
 //update notes on use effect
@@ -677,13 +683,14 @@ const handleCheckboxChange = (index,status) =>{
 
     
               {taskProfile.notes && taskProfile.notes.length > 0 ? (
-    <div style={{ marginTop: '20px', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
+    <div style={{ width:"80vw", marginTop: '20px', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
         {/* <h4 style={{ marginBottom: '10px' }}>Notes:</h4> */}
         
         {taskProfile.notes.map((note, index) => (
     <div 
         key={index} 
         style={{ 
+            width:"95v",
             display: 'flex',  // Make it a flex container
             justifyContent: 'space-between',  // Align items to the far ends
             marginBottom: '15px', 
@@ -1029,12 +1036,14 @@ const handleCheckboxChange = (index,status) =>{
             </Accordion>        </div>
 </div>
   
-            <Box style={{ padding: 0}}    width={"100%"} paddin
-             display="flex" flexDirection={"column"} justifyContent="center" alignItems="center" p={5}>
+            <Box  className = "task-box"
+                >
                 {filteredTasks.map((task, index) => (
                     <>
-                    <Card style={{backgroundColor:index % 2 ==0? "#C4D4E0":"",textDecoration: task.status === "close"?"line-through":""}}
-                    key={task.taskId} sx={{ display: "flex", minWidth: "100%", margin: 1 }}>
+                    <Card
+                    className="task-box-card"
+                     style={{backgroundColor:index % 2 ==0? "#C4D4E0":"",textDecoration: task.status === "close"?"line-through":""}}
+                    key={task.taskId} sx={{ display: "flex", margin: 1 }}>
                         <CardContent style={{width:"20%"}}>
                             <div  
                                 onClick={()=>{
@@ -1108,10 +1117,9 @@ const handleCheckboxChange = (index,status) =>{
                         </CardContent>
                     </Card>
                   {  task.status == "open" && <div 
+                  className="status-banner"
   style={{
-    marginTop: "-10px",
-    width: "100%",
-    marginBottom: "5px",
+
     backgroundColor: calculateUrgency(task.timeCreated, task.dueDate) === "Due in a Week" ? "#FFF59D" :
                      calculateUrgency(task.timeCreated, task.dueDate) === "Due in 6 Days" ? "#FFCC80" :
                      calculateUrgency(task.timeCreated, task.dueDate) === "Due in 5 Days" ? "#FFB74D" :

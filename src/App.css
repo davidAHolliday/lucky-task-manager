@@ -169,6 +169,32 @@ body {
      }
 
 
+
+
+     .task-box {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    
+    .task-box-card {
+      width: 100%; /* Initially, set width to 100% for one column layout */
+    
+      /* For large screens, set width to 48% for two columns */
+      @media (min-width: 768px) {
+        width: 100%;
+      }
+    }
+.status-banner{
+  margin-top:-10px;
+  width: 100%;
+  margin-bottom: 5px
+
+
+}
+
+
+
 /* Adjustments for phone screens */
 @media only screen and (max-width: 480px) {
   .App {
@@ -283,6 +309,8 @@ table {
   background-color: grey;
   overflow-y: scroll;
 }
+
+
 
 
 
