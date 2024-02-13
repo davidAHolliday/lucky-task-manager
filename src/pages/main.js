@@ -24,6 +24,8 @@ import { Delete, DeleteForever, ExpandMoreOutlined } from "@mui/icons-material";
 import CircularProgress from '@mui/material/CircularProgress';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import DateCalendarServerRequest, { CalendarWidget, ServerDay } from "./components/calendar";
+import dayjs from "dayjs";
 
 
 
@@ -50,6 +52,8 @@ function Dashboard() {
     const [expanded, setExpanded] = useState(false); // State to manage accordion's open/close state
     const [customTag,setCustomTag] = useState(null);
     const [displayChecklist,setDisplayChecklist] = useState(false)
+    const [date,setDate] = useState(null);
+    const [viewCount, setViewCount] = useState(15);
 
     const tagContainerStyle = {
         display: 'flex',
@@ -360,17 +364,32 @@ const handleNewNoteInputChange = (event) => {
             if (tagValue !== "All") {
                 filtered = filtered.filter(task => task.tags.includes(tagValue));
             }
+
+            if (date !== null) {
+                filtered = filtered.filter(task => {
+
+                    const taskDueDate = dayjs(task.dueDate)
+                console.log(taskDueDate.format('YYYY-MM-DD'),date)
+                   return  taskDueDate.format('YYYY-MM-DD') === date;
+                    
+                });
+            }
     
             // Sort the tasks by due date
             const sortedTasks = filtered.sort((a, b) => {
                 const dateComparison = new Date(a.dueDate) - new Date(b.dueDate);
                 return dateComparison;
             });
+
+    
+            
+    
+      
     
             // Update the filtered tasks state
             setFilteredTasks([...sortedTasks]);
         }
-    }, [filterValue, tagValue, data, switchState]); // Include tagValue in the dependency array
+    }, [filterValue, tagValue, data, switchState,date]); // Include tagValue in the dependency array
     
     const handleTaskDelete = (id) => {
         setSelectedForDelete(id);
@@ -517,6 +536,23 @@ const handleCheckboxChange = (index,status) =>{
         }
     };
 
+
+    const handleDayClick = (clickedDay) => {
+        console.log('Clicked day:', clickedDay.format('YYYY-MM-DD'));
+        setDate(clickedDay.format('YYYY-MM-DD'));
+      };
+
+const resetDate = ()=>{
+    setDate(null)
+}
+
+const extendedView =()=>{
+    if(viewCount === 50){
+        setViewCount(15)
+    }
+    setViewCount(50)
+
+}
 
     return (
         <> {data.length == 0? <div style={{display:"flex" , flexDirection:"column"}}><CircularProgress />
@@ -1035,10 +1071,11 @@ const handleCheckboxChange = (index,status) =>{
                 </AccordionDetails>
             </Accordion>        </div>
 </div>
+<DateCalendarServerRequest resetDate={resetDate}handleDayClick={handleDayClick} data={filteredTasks} date={date}/>
   
             <Box  className = "task-box"
                 >
-                {filteredTasks.map((task, index) => (
+                {filteredTasks.slice(0,viewCount).map((task, index) => (
                     <>
                     <Card
                     className="task-box-card"
@@ -1135,7 +1172,6 @@ const handleCheckboxChange = (index,status) =>{
   {calculateUrgency(task.timeCreated, task.dueDate)}
 </div>
 }
-
 </>
                 ))}
                 <Snackbar
@@ -1155,6 +1191,8 @@ const handleCheckboxChange = (index,status) =>{
                     </MuiAlert>
                 </Snackbar>
             </Box>
+            <button onClick={()=>extendedView()} style={{width:"100%"}}>Extend/Minimize View</button>
+
         </div>
         }</>
     );
