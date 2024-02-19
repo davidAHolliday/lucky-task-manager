@@ -225,6 +225,8 @@ function GuestProjections() {
           <th style={thStyle}>Day</th>
         <th style={thStyle}>Projections</th>
       <th style={thStyle}>Modified</th>
+      <th style={thStyle}>Diff (+/-)</th>
+
           </tr>
         </thead>
         <tbody>
@@ -250,6 +252,9 @@ function GuestProjections() {
                         parseFloat(daysValue[day.value]) * (1 + percentageDiff / 100)
                       )}
                 </td>
+                <td>{Math.floor(
+                        parseFloat(daysValue[day.value]) * (1 + percentageDiff / 100)
+                      )-(parseFloat(daysValue[day.value]))}</td>
               </tr>
             ) })}
 
