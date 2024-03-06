@@ -5,6 +5,7 @@ import BackspaceIcon from '@mui/icons-material/Backspace';
 const Login = ({ onLogin }) => {
   const [input, setInput] = useState('');
   const correctPin = '2019';
+  const davidPin = '1988'
 
   useEffect(() => {
     const isAuthenticated = sessionStorage.getItem("auth")
@@ -21,7 +22,6 @@ const Login = ({ onLogin }) => {
 
 
   const handleBackspaceClick = () => {
-    console.log("BACKSPAC")
     setInput((prevInput) => prevInput.slice(0, -1));
     const dotIndex = input.length - 1;
     const dotElement = document.getElementById(`dot-${dotIndex}`);
@@ -45,7 +45,7 @@ const Login = ({ onLogin }) => {
 
   const handleEnterClick = () => {
     console.log("code entered", input);
-    if (input !== correctPin) {
+    if (input !== correctPin && input !== davidPin) {
       document.body.classList.add('wrong');
       setTimeout(()=>{
         document.body.classList.remove('wrong', 'correct');

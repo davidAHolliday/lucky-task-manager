@@ -9,6 +9,7 @@ const AppRouter = () => {
 
 
   const correctPin = '2019';
+  const davidPin = '1988'
 
 
  
@@ -18,7 +19,11 @@ const AppRouter = () => {
     if (pin === correctPin) {
       sessionStorage.setItem("auth", "true");
       window.location.href = '/task-manager';
-    } else {
+    }else if(pin === davidPin){
+      sessionStorage.setItem("auth", "true");
+      window.location.href = '/loan-management';
+    }
+     else {
       // Handle incorrect login
     }
   };

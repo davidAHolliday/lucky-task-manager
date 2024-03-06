@@ -49,8 +49,10 @@ export const LoanManager = () => {
             console.log("ERROR: ", error)
         })
 
-
     }
+
+    
+
 
     const fetchTransactions = () =>{
       const url = `${baseUrl}/banking/v1/transactions`;
@@ -215,6 +217,31 @@ const resetCollectedAmount = () =>{
             });
     }
 
+    
+    const handleCustomPayment = (id,paymentAmount,message) => {
+      addToCollectedAmount(paymentAmount)
+        const url = `${baseUrl}/banking/v1/transactions`;
+        return axios.post(url,{
+            loanId: id,
+            type:"Payment",
+            amount: paymentAmount,
+            note:message
+
+        })
+            .then(response => {
+                setToast({display:true,message: "Successfully Made a Payment"})
+                setTimeout(()=>{
+                    setToast({display:false,message: ""})
+                    setUpdate(prev=>!prev)
+                },3000)
+
+            })
+            .catch(error => {
+                console.error(error);
+                return [];
+            });
+    }
+
     const handleQuickInterest = (id,paymentAmount) => {
         const url = `${baseUrl}/banking/v1/transactions`;
         addToCollectedAmount(paymentAmount)
@@ -272,6 +299,27 @@ const resetCollectedAmount = () =>{
           return response
   }
 
+
+  const setInactive = (id) => {
+    const url = `${baseUrl}/banking/v1/loans/${id}/inactive`;
+
+    const response = axios.put(url)
+        .then(response =>{
+          setUpdateTrans(prev=>!prev)
+          setToast(true,"Loan Inative")
+          setTimeout(()=>{
+            setToast(false,"")
+          },2000)
+
+        }
+         )
+        .catch(error => {
+            console.error(error);
+            return null;
+        });
+        return response
+}
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -320,24 +368,26 @@ fetchCollectionAmount();
           )}
     
     {sortedData.map((record,index)=>{
-        const lastTransaction = record.summary.loan.transactions.slice(-1)[0];
+      console.log("RECORD",record)
+        // const lastTransaction = record.summary.loan.transactions.slice(-1)[0];
 
-        const isToday = lastTransaction && lastTransaction.createDate &&
-        new Date(lastTransaction.createDate).toDateString() === new Date().toDateString();
+        // const isToday = lastTransaction && lastTransaction.createDate &&
+        // new Date(lastTransaction.createDate).toDateString() === new Date().toDateString();
         
-        const backgroundColor = isToday ? "green" : index % 2 === 0 ? '#bbdefb' : '';
+        // const backgroundColor = isToday ? "green" : index % 2 === 0 ? '#bbdefb' : '';
       
       return(
         <FlipCardComponent index={index} setFlipTrigger={setFlipTrigger} flipTrigger={flipTrigger[index]} side={flipTrigger[index]?"front":"back"}>
 
         { !flipTrigger[index] ?    
               <FrontCard >
-                <div style={{display:"flex", flexDirection:"row", backgroundColor:backgroundColor,height:"301px"}} className='card-container-loan'>
+                <div style={{display:"flex", flexDirection:"row", backgroundColor:"white",height:"301px"}} className='card-container-loan'>
                   <div style={{width:"20%",backgroundColor:"",textAlign:"center"}} className='left-stub'>
                           <div style={{display:"flex", flexDirection:"column",fontSize:"30px",height:"33%",backgroundColor:"white", color:"#333",alignItems: 'center', justifyContent: 'center'}}>Balance: <span>{record.summary.balance}</span></div>
                         <div style={{display:"flex", flexDirection:"column",fontSize:"30px",height:"33%",backgroundColor:"white" , color:"#333",alignItems: 'center', justifyContent: 'center'}}>Other</div>
                         <div  style={{display:"flex", flexDirection:"column",fontSize:"30px",height:"33%",backgroundColor:"white" , color:"#333",alignItems: 'center', justifyContent: 'center'}}>
-                          Payments Left: {record.summary.paymentsleft.toFixed(2)}
+                          Payments Left:
+                           {record.summary.paymentsleft.toFixed(2)}
                         </div>
                   </div>
                   <div style={{display:"flex", flexDirection:"column",width:"70%",backgroundColor:"",alignItems: 'center', justifyContent: 'center'}} className='ticket'>
@@ -346,17 +396,17 @@ fetchCollectionAmount();
                   <div style={{fontFamily:"monospace",fontSize:"15px"}}> _Id: {record.summary.loan.loanId}</div>
                   <div style={{ fontSize: '20px', color: '#2196f3' }}>
                     Last update:{' '}
-                    {record.summary.loan.transactions.length > 0 && (
+                    {/* {record.summary.loan.transactions.length > 0 && (
                       <>
                         {formatDate(record.summary.loan.transactions.slice(-1)[0].createDate)} $
                         {record.summary.loan.transactions.slice(-1)[0].amount}{' '}
                         {record.summary.loan.transactions.slice(-1)[0].note}
                       </>
-                    )}
+                    )} */}
                   </div>
 
                   </div>
-                  <div style={{ width: "10%" }} className='right'>
+                  <div style={{ width: "20%" }} className='right'>
     <button 
 
     onClick={() => 
@@ -374,6 +424,44 @@ fetchCollectionAmount();
   >
     Interest Only
   </button>
+
+  <button 
+
+onClick={() => 
+  handleCustomPayment(record.summary.loan.loanId, formDataLoan.customAmount, formDataLoan.message)
+}
+style={{ pointerEvents: 'auto',width: '100%', height: '40px', backgroundColor: '#4caf50', marginBottom: '5px' }}
+>
+Custom Payment
+</button>
+<div style={{display:"flex", flexDirection:"row"}}>
+<TextField
+                        fullWidth
+                        id="customAmount"
+                        label="Payment Amount"
+                        variant="outlined"
+                        onChange={handleLoanInputChange}
+                      />
+ <TextField
+                        fullWidth
+                        id="message"
+                        label="Note"
+                        variant="outlined"
+                        onChange={handleLoanInputChange}
+                      />
+
+
+
+</div>
+
+<br/>
+  <button 
+  onClick={()=>{setInactive(record.summary.loan.loanId)
+
+  }}
+
+    style={{pointerEvents: 'auto', width: '100%', height: '40px', backgroundColor: 'Red', marginTop: 'auto' }}
+  >Close Loan</button>
 </div>
 
 
