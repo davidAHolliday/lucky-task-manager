@@ -113,7 +113,7 @@ useEffect(()=>{
       {!cameraStatus && <button onClick={openCamera}>Open Camera</button>}
       {cameraStatus && (
         <>
-          <button onClick={capture}>Take Picture</button>
+       {  !capturedImage &&   <button onClick={capture}>Take Picture</button>}
           {/* <button onClick={closeCamera}>Close Camera</button> */}
         </>
       )}
