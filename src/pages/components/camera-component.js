@@ -53,7 +53,7 @@ const CameraComponent = (props) => {
 
     const openCamera = async () => {
         try {
-          stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          stream = await navigator.mediaDevices.getUserMedia({ video: true,videoType:"back" });
           videoRef.current.srcObject = stream;
           setCameraStatus(true);
         } catch (err) {
