@@ -570,7 +570,7 @@ const extendedView =()=>{
          
            }}
          >
-           {/* <CameraComponent taskProfile={taskProfile} index={checkListIndex} showCamModal={setShowCamModal} /> */}
+           <CameraComponent taskProfile={taskProfile} index={checkListIndex} showCamModal={setShowCamModal} />
            <button onClick={()=>setShowCamModal(false)} style={{ marginTop: '10px' }}>Close Camera Modal</button>
          </div>
        </Dialog>
