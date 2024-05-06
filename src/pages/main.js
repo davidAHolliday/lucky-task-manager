@@ -570,7 +570,7 @@ const extendedView =()=>{
          
            }}
          >
-           <CameraComponent taskProfile={taskProfile} index={checkListIndex} showCamModal={setShowCamModal} />
+           {/* <CameraComponent taskProfile={taskProfile} index={checkListIndex} showCamModal={setShowCamModal} /> */}
            <button onClick={()=>setShowCamModal(false)} style={{ marginTop: '10px' }}>Close Camera Modal</button>
          </div>
        </Dialog>
@@ -686,10 +686,10 @@ const extendedView =()=>{
               
             </div>
             <div className="image-box">
-                    <ImageComponent data={item.photo} index={index} />
-                    <CameraAltIcon onClick={() => {
+                    {/* <ImageComponent data={item.photo} index={index} /> */}
+                    {/* <CameraAltIcon onClick={() => {
                     setShowCamModal(true);
-                    setChecklistIndex(index)}}/>
+                    setChecklistIndex(index)}}/> */}
                    
                    
               
