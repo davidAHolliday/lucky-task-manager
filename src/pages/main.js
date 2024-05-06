@@ -559,7 +559,7 @@ const extendedView =()=>{
 }
 
     return (
-        <> {data.length == 0? <div style={{display:"flex" , flexDirection:"column"}}><CircularProgress />
+        <> {false ? <div style={{display:"flex" , flexDirection:"column"}}><CircularProgress />
         <div>Loading</div>
         </div> :
         <div className="App">
@@ -686,10 +686,10 @@ const extendedView =()=>{
               
             </div>
             <div className="image-box">
-                    {/* <ImageComponent data={item.photo} index={index} /> */}
-                    {/* <CameraAltIcon onClick={() => {
+                    <ImageComponent data={item.photo} index={index} /> 
+                <CameraAltIcon onClick={() => {
                     setShowCamModal(true);
-                    setChecklistIndex(index)}}/> */}
+                    setChecklistIndex(index)}}/>
                    
                    
               
