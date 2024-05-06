@@ -26,7 +26,9 @@ import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import DateCalendarServerRequest, { CalendarWidget, ServerDay } from "./components/calendar";
 import dayjs from "dayjs";
-
+import CameraComponent from "./components/camera-component";
+import ImageComponent from "./components/loadImage";
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 
 
 
@@ -54,6 +56,8 @@ function Dashboard() {
     const [displayChecklist,setDisplayChecklist] = useState(false)
     const [date,setDate] = useState(null);
     const [viewCount, setViewCount] = useState(15);
+    const [showCamModal, setShowCamModal] = useState(false)
+    const [checkListIndex,setChecklistIndex] = useState();
 
     const tagContainerStyle = {
         display: 'flex',
@@ -336,7 +340,7 @@ const handleNewNoteInputChange = (event) => {
             .catch(error => {
                 console.error("Error Fetching Data:", error);
             });
-    }, [updateMessage,noteData,deletedItemResponse]);
+    }, [updateMessage,noteData,deletedItemResponse,checklistData]);
 
 
       const tags = ["All",...new Set(data.flatMap(task => task.tags))]; // Unique tags across all tasks
@@ -559,7 +563,20 @@ const extendedView =()=>{
         <div>Loading</div>
         </div> :
         <div className="App">
-       
+  {showCamModal && (
+         <Dialog open={showCamModal} onClose={()=>setShowCamModal(false)} style={{ width:"90%",zIndex: 2000 }}>
+         <div
+           style={{
+         
+           }}
+         >
+           <CameraComponent taskProfile={taskProfile} index={checkListIndex} showCamModal={setShowCamModal} />
+           <button onClick={()=>setShowCamModal(false)} style={{ marginTop: '10px' }}>Close Camera Modal</button>
+         </div>
+       </Dialog>
+      )}
+
+      
        <FormControl component="fieldset" variant="standard">
   <FormGroup>
     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -600,14 +617,14 @@ const extendedView =()=>{
 
 
               {/*  Info Modal */}
-              { taskProfile  && <>
-        <Dialog open={displayDetails} onClose={() => setDisplayDetails(false)}>
-        <DialogTitle style={{backgroundColor:"lightblue"}}>Task Details</DialogTitle>
-        <DialogContent>
+              {( taskProfile && displayDetails)  && <>
+        <div className="task-modal" >
+        <div className="task-modal-title" >Task Details</div>
+        <div className="task-modal-content" >
             <div onClick={()=>{
                 handleEditTask(taskProfile)
                 setDisplayNewTaskModal(false)}}style={{marginTop:"25px",color:"blue"}}>Edit</div>
-            <div style ={{height:"500px", width:"300px"}}>
+            <div className="task-modal-content-container" >
                 <h2>{taskProfile.taskName}</h2>
                 <p><span style={{fontWeight:500, marginRight:"5px"}}>Description:</span>{taskProfile.taskDescription}</p>
                 <p> <span style={{fontWeight:500, marginRight:"5px"}}>Assigned To:</span> {taskProfile.assignedTo || "unknown"} on {formatDate(taskProfile.timeCreated)}</p>
@@ -645,42 +662,46 @@ const extendedView =()=>{
                 onClick={() => setDisplayChecklist(prev => !prev)} // Toggle dropdown visibility on click
             >
                 <span style={{marginRight:"10px"}}>Checklist</span> <ArrowDropDownCircleIcon/>
-            </div>{displayChecklist &&<> 
-    <div style={{ marginTop: '20px', borderTop: '1px solid #ccc', paddingTop: '10px' }}>
-        {taskProfile.checkListItems.map((item, index) =>{
-            const strikeout = (item.doneStatus == true ? "Line-through" : "None")
-            return(
-            <div 
-                key={index} 
-                style={{ 
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',  // Align items vertically in the center
-                    marginBottom: '5px', 
-                    padding: '5px', 
-                    borderRadius: '5px', 
-                }}
-            >
-                <div>
-                    <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#333',textDecoration: strikeout , textDecorationColor:"red" }}>
-                    {item.index} {item.itemText}
-                    </p>
-                  
-                </div>
-                <div>
-                    {/* Checkbox input */}
-                    <input 
-                        type="checkbox" 
-                        checked={item.doneStatus}  // Set the checked state based on the doneStatus
-                        onChange={(e) => handleCheckboxChange(item.index,item.doneStatus)}  // Call handleCheckboxChange on checkbox change
-                    />
-                </div>
             </div>
-        )})}
-    </div>
+            {displayChecklist &&<> 
+    <div className="task-main-container" >
+    {taskProfile.checkListItems.map((item, index) => {
+    const strikeout = item.doneStatus ? "line-through" : "none";
+    return (
+        <div 
+            key={index} 
+          className="check-list-map" 
+        >
+            <div className="check-list-name">
+                <p 
+                style={{ fontWeight: 'bold', marginBottom: '5px', color: '#333', textDecoration: strikeout }}
+                >
+                    {index} {item.itemText}
+                </p>
+                <input 
+                    type="checkbox" 
+                    checked={item.doneStatus}
+                    onChange={(e) => handleCheckboxChange(index + 1, item.doneStatus)}
+                />
+              
+            </div>
+            <div className="image-box">
+                    <ImageComponent data={item.photo} index={index} />
+                    <CameraAltIcon onClick={() => {
+                    setShowCamModal(true);
+                    setChecklistIndex(index)}}/>
+                   
+                   
+              
+                </div>
+            <div>
+          
+            </div>
+        </div>
+    );
+})}
 
-
-<div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+<div className="add-to-list-input" >
     {/* TextField Component */}
     <TextField
         autoFocus
@@ -689,7 +710,7 @@ const extendedView =()=>{
         name="clItem"
         label="Add Item To List"
         type="text"
-        style={{ flex: 1, marginRight: '10px', height: '50px' }}  // Set flex and height properties
+        style={{ flex: 1, marginRight: '10px', height: '50px', width:"80%" }}  // Set flex and height properties
         value={checklistData.itemText}
         onChange={(val)=>handleAddCheckListChange(val,taskProfile.checkListItems.length+1)}  // Ensure this is correctly set
     />
@@ -711,6 +732,11 @@ const extendedView =()=>{
     </button>
 </div>
 
+    </div>
+
+
+
+
  </>}
 
 
@@ -725,16 +751,7 @@ const extendedView =()=>{
         {taskProfile.notes.map((note, index) => (
     <div 
         key={index} 
-        style={{ 
-            width:"95v",
-            display: 'flex',  // Make it a flex container
-            justifyContent: 'space-between',  // Align items to the far ends
-            marginBottom: '15px', 
-            padding: '10px', 
-            borderRadius: '5px', 
-            boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.1)', 
-            backgroundColor: '#f9f9f9' 
-        }}
+       className="notes-card"
     >
         <div>
             <p style={{ fontWeight: 'bold', marginBottom: '5px', color: '#333' }}>
@@ -771,7 +788,7 @@ const extendedView =()=>{
             
         
         
-        </DialogContent>
+        </div>
         <DialogActions>
                     <Button onClick={() => setDisplayDetails(false)} color="primary">
                         Cancel
@@ -780,7 +797,7 @@ const extendedView =()=>{
                        Add Notes
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </div>
         </>}
         {/** New Modal*
  */}

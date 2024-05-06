@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import "./security.css"
 import BackspaceIcon from '@mui/icons-material/Backspace';
+import axios from 'axios';
 
 const Login = ({ onLogin }) => {
   const [input, setInput] = useState('');
@@ -89,8 +90,13 @@ const Login = ({ onLogin }) => {
   };
   
 
+ 
+  
+
   return (
-    <div id="pin" className="pin-container">
+    <div className='page-container'>
+    <div id="pin" className="pin-pad">
+
       <div className="dots">
         {[...Array(4).keys()].map((_, index) => (
           <div key={index} id={`dot-${index}`} className="dot"></div>
@@ -198,7 +204,9 @@ const Login = ({ onLogin }) => {
         Enter
       </button>
     </div>
+    </div>
   );
+
 };
 
 export default Login;

@@ -1,4 +1,8 @@
-body {
+
+
+
+
+.page-container {
     height: 100vh;
     width: 100%;
     display: flex;
@@ -54,9 +58,9 @@ body {
     padding-top: 19em;
     padding-bottom: 11em;
     border-radius: .3em;
-    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+    /* box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3); */
     margin: auto;
-    color: rgba(255, 255, 255, 0.2);
+    color: Red
   }
   
   .dots {
@@ -79,6 +83,7 @@ body {
   .dot.active {
     animation: growDot .5s ease;
     animation-fill-mode: forwards;
+    
   }
   
   .dot.wrong {
