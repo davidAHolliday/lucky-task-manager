@@ -53,13 +53,14 @@ const CameraComponent = (props) => {
 
     const openCamera = async () => {
         try {
-          stream = await navigator.mediaDevices.getUserMedia({ video: true,videoType:"back" });
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
           videoRef.current.srcObject = stream;
           setCameraStatus(true);
         } catch (err) {
           console.error('Error accessing camera:', err);
         }
       };
+      
 
 useEffect(()=>{
 
